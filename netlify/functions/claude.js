@@ -1,3 +1,5 @@
+const https = require("https");
+
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
@@ -8,35 +10,48 @@ exports.handler = async (event) => {
     return {
       statusCode: 500,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ error: { message: "ANTHROPIC_API_KEY not set in Netlify." } })
+      body: JSON.stringify({ error: { message: "ANTHROPIC_API_KEY not set." } })
     };
   }
 
-  try {
-    const body = JSON.parse(event.body || "{}");
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "anthropic-version": "2023-06-01",
-        "x-api-key": apiKey,
+  const bodyStr = event.body || "{}";
+
+  return new Promise((resolve) => {
+    const req = https.request(
+      {
+        hostname: "api.anthropic.com",
+        path: "/v1/messages",
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "anthropic-version": "2023-06-01",
+          "x-api-key": apiKey,
+          "Content-Length": Buffer.byteLength(bodyStr),
+        },
       },
-      body: JSON.stringify(body),
+      (res) => {
+        let data = "";
+        res.on("data", (chunk) => { data += chunk; });
+        res.on("end", () => {
+          resolve({
+            statusCode: res.statusCode,
+            headers: {
+              "Content-Type": "application/json",
+              "Access-Control-Allow-Origin": "*",
+            },
+            body: data,
+          });
+        });
+      }
+    );
+    req.on("error", (err) => {
+      resolve({
+        statusCode: 500,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ error: { message: err.message } }),
+      });
     });
-    const data = await response.json();
-    return {
-      statusCode: response.status,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-      },
-      body: JSON.stringify(data),
-    };
-  } catch (err) {
-    return {
-      statusCode: 500,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ error: { message: err.message } }),
-    };
-  }
+    req.write(bodyStr);
+    req.end();
+  });
 };

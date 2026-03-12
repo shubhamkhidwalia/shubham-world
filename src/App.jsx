@@ -3,29 +3,14 @@ import { useState, useEffect, useRef, useCallback } from "react";
 const GFONTS = `@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap');`;
 const FAVICON_B64 = "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";
 
-/* ─────────────────────────────────────────────
-   OWNER AUTH — Secret URL approach
-   Visit:  yoursite.com?s=shubham  → unlocks THIS device forever
-   Anyone else sees zero owner UI, no dot, no modal, nothing
-   To lock your own device: yoursite.com?s=lock
-───────────────────────────────────────────── */
-const OWNER_SECRET  = "shubham";          // your secret param value
-const OWNER_LS_KEY  = "sw-owner-v2";      // localStorage key
-
+/* ── Owner auth via secret URL ── */
+const OWNER_SECRET = "shubham";
+const OWNER_LS_KEY = "sw-owner-v2";
 const checkUrlOwner = () => {
   const p = new URLSearchParams(window.location.search);
   const s = p.get("s");
-  if (s === OWNER_SECRET) {
-    localStorage.setItem(OWNER_LS_KEY, "true");
-    // Clean URL so secret isn't visible in browser bar
-    window.history.replaceState({}, "", window.location.pathname);
-    return true;
-  }
-  if (s === "lock") {
-    localStorage.removeItem(OWNER_LS_KEY);
-    window.history.replaceState({}, "", window.location.pathname);
-    return false;
-  }
+  if (s === OWNER_SECRET) { localStorage.setItem(OWNER_LS_KEY,"true"); window.history.replaceState({},"",window.location.pathname); return true; }
+  if (s === "lock") { localStorage.removeItem(OWNER_LS_KEY); window.history.replaceState({},"",window.location.pathname); return false; }
   return localStorage.getItem(OWNER_LS_KEY) === "true";
 };
 
@@ -41,37 +26,39 @@ const CATS = [
   { id:"habits",    label:"Habits",    icon:"🧠",  color:"#F5C518" },
 ];
 const SHAPE = { movies:"tall",shows:"tall",songs:"sq",articles:"wide",videos:"wide",actors:"tall",actresses:"tall",sports:"tall",habits:"wide" };
-const STORE_KEY = "sw-v12";
-const RATINGS   = ["★ Liked","★★ Loved","★★★ Obsessed"];
+const RATINGS = ["★ Liked","★★ Loved","★★★ Obsessed"];
 
-const dbGet = () => { try { const r=localStorage.getItem(STORE_KEY); return r?JSON.parse(r):{}; } catch{return{};} };
-const dbSet = d => { try { localStorage.setItem(STORE_KEY,JSON.stringify(d)); } catch{} };
+/* ── Gist DB ── */
+const gistRead  = async () => {
+  const r = await fetch("/.netlify/functions/gist");
+  if (!r.ok) throw new Error("Failed to load vault");
+  return r.json();
+};
+const gistWrite = async (data) => {
+  const r = await fetch("/.netlify/functions/gist", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!r.ok) throw new Error("Failed to save vault");
+};
 
-const score = (item,idx) => {
-  const w={"★★★ Obsessed":3,"★★ Loved":2,"★ Liked":1}[item.rating]||0;
+const score = (item, idx) => {
+  const w = {"★★★ Obsessed":3,"★★ Loved":2,"★ Liked":1}[item.rating]||0;
   return w*10+Math.max(0,100-idx*3);
 };
 
-/* AI FILL — calls Netlify function (fixes CORS) */
+/* ── AI Fill ── */
 const aiFill = async (name, catLabel, onStatus) => {
   onStatus?.("✨ Searching…");
   const payload = {
-    model: "claude-3-5-haiku-20241022",
+    model: "claude-3-haiku-20240307",
     max_tokens: 900,
     system: "Pop-culture expert. Respond ONLY with valid JSON. No markdown, no prose.",
-    messages: [{
-      role: "user",
-      content: `Details for: "${name}" (category: ${catLabel}). Return ONLY this JSON:
-{"description":"2-3 engaging sentences","genre":"1-3 word genre","year":"4-digit year or empty","fact":"surprising fact","tagline":"famous quote under 10 words or empty","imageUrl":"real direct image URL ending .jpg .jpeg .png .webp from Wikipedia/Wikimedia/TMDb/official","link":"best URL: Wikipedia IMDb Spotify YouTube or official site"}`
-    }]
+    messages: [{ role:"user", content:`Details for: "${name}" (category: ${catLabel}). Return ONLY this JSON:
+{"description":"2-3 engaging sentences","genre":"1-3 word genre","year":"4-digit year or empty","fact":"surprising fact","tagline":"famous quote under 10 words or empty","imageUrl":"real direct image URL ending .jpg .jpeg .png .webp from Wikipedia/Wikimedia/TMDb/official","link":"best URL: Wikipedia IMDb Spotify YouTube or official site"}`}]
   };
-
-  const res = await fetch("/.netlify/functions/claude", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  });
-
+  const res = await fetch("/.netlify/functions/claude", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) });
   if (!res.ok) throw new Error(`Error ${res.status}`);
   const data = await res.json();
   if (data.error) throw new Error(data.error.message||"API error");
@@ -79,12 +66,9 @@ const aiFill = async (name, catLabel, onStatus) => {
   const raw   = (data.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("").trim();
   const clean = raw.replace(/```[a-z]*\n?/gi,"").replace(/```/g,"").trim();
   const hits  = [...clean.matchAll(/\{[\s\S]*?\}/g)].map(m=>m[0]).sort((a,b)=>b.length-a.length);
-  for (const c of hits) {
-    try { const o=JSON.parse(c); if(o.description||o.genre||o.imageUrl) return o; } catch{}
-  }
+  for (const c of hits) { try { const o=JSON.parse(c); if(o.description||o.genre||o.imageUrl) return o; } catch{} }
   throw new Error("Could not parse response");
 };
-
 const CSS = `
 ${GFONTS}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -667,39 +651,55 @@ function SearchBar({ allItems }) {
 
 /* ══════════ APP ══════════ */
 export default function App() {
-  const [data,setData]       = useState(()=>dbGet());
-  /* Owner = URL param or remembered device — no modal, no tap dance */
-  const [isOwner,setIsOwner] = useState(()=>checkUrlOwner());
-  const [showAdd,setShowAdd] = useState(false);
-  const [addCat,setAddCat]   = useState(null);
-  const [editItem,setEditItem]= useState(null);
-  const [detail,setDetail]   = useState(null);
-  const [toast,setToast]     = useState(null);
-  const [scrolled,setScrolled]= useState(false);
-  const [spotTop,setSpotTop] = useState(null);
+  const [data,     setData]     = useState({});
+  const [loading,  setLoading]  = useState(true);
+  const [saving,   setSaving]   = useState(false);
+  const [isOwner,  setIsOwner]  = useState(()=>checkUrlOwner());
+  const [showAdd,  setShowAdd]  = useState(false);
+  const [addCat,   setAddCat]   = useState(null);
+  const [editItem, setEditItem] = useState(null);
+  const [detail,   setDetail]   = useState(null);
+  const [toast,    setToast]    = useState(null);
+  const [scrolled, setScrolled] = useState(false);
+  const [spotTop,  setSpotTop]  = useState(null);
   const toastTimer = useRef(null);
+  const saveTimer  = useRef(null);
 
+  /* Favicon + title */
   useEffect(()=>{
     document.querySelectorAll("link[rel*='icon']").forEach(el=>el.remove());
-    const lnk=document.createElement("link");
-    lnk.rel="icon"; lnk.type="image/png";
+    const lnk=document.createElement("link"); lnk.rel="icon"; lnk.type="image/png";
     lnk.href=`data:image/png;base64,${FAVICON_B64}`;
     document.head.appendChild(lnk);
     document.title="Shubham.World";
   },[]);
 
-  useEffect(()=>{dbSet(data);},[data]);
-  useEffect(()=>{const fn=()=>setScrolled(window.scrollY>60);window.addEventListener("scroll",fn);return()=>window.removeEventListener("scroll",fn);},[]);
+  /* Load vault from Gist on mount */
+  useEffect(()=>{
+    gistRead()
+      .then(d=>{ setData(d||{}); setLoading(false); })
+      .catch(()=>{ setLoading(false); showT("Could not load vault","⚠️"); });
+  },[]);
 
-  const showT=(m,e="✅")=>{setToast({msg:m,emoji:e});clearTimeout(toastTimer.current);toastTimer.current=setTimeout(()=>setToast(null),2600);};
+  /* Auto-save to Gist when owner changes data */
+  useEffect(()=>{
+    if (!isOwner || loading) return;
+    clearTimeout(saveTimer.current);
+    setSaving(true);
+    saveTimer.current = setTimeout(()=>{
+      gistWrite(data)
+        .then(()=>setSaving(false))
+        .catch(()=>{ setSaving(false); showT("Save failed","⚠️"); });
+    }, 1200);
+  },[data]);
 
-  const lockOwner=()=>{
-    localStorage.removeItem(OWNER_LS_KEY);
-    setIsOwner(false);
-    showT("Vault locked","🔒");
-  };
+  useEffect(()=>{const fn=()=>setScrolled(window.scrollY>60); window.addEventListener("scroll",fn); return()=>window.removeEventListener("scroll",fn);},[]);
 
-  const items    = id=>data[id]||[];
+  const showT=(m,e="✅")=>{setToast({msg:m,emoji:e}); clearTimeout(toastTimer.current); toastTimer.current=setTimeout(()=>setToast(null),2600);};
+
+  const lockOwner=()=>{ localStorage.removeItem(OWNER_LS_KEY); setIsOwner(false); showT("Vault locked","🔒"); };
+
+  const items    = id => data[id]||[];
   const allItems = CATS.flatMap(cat=>items(cat.id).map(item=>({item,cat})));
   const total    = allItems.length;
   const linked   = allItems.filter(({item})=>item.link).length;
@@ -710,28 +710,45 @@ export default function App() {
   const openEdit = (item,cat) =>{setAddCat(cat);setEditItem(item);setShowAdd(true);};
   const openDet  = (item,cat) =>setDetail({item,cat});
 
-  const handleSave=vals=>{
-    if(editItem){setData(d=>({...d,[addCat.id]:(d[addCat.id]||[]).map(i=>i.id===editItem.id?{...i,...vals}:i)}));showT(`"${vals.name}" updated!`,"💾");}
-    else{setData(d=>({...d,[addCat.id]:[...(d[addCat.id]||[]),{...vals,id:Date.now().toString()}]}));showT(`"${vals.name}" added!`,addCat.icon);}
-    setShowAdd(false);setEditItem(null);
+  const handleSave = vals => {
+    if (editItem) {
+      setData(d=>({...d,[addCat.id]:(d[addCat.id]||[]).map(i=>i.id===editItem.id?{...i,...vals}:i)}));
+      showT(`"${vals.name}" updated!`,"💾");
+    } else {
+      setData(d=>({...d,[addCat.id]:[...(d[addCat.id]||[]),{...vals,id:Date.now().toString()}]}));
+      showT(`"${vals.name}" added!`,addCat.icon);
+    }
+    setShowAdd(false); setEditItem(null);
   };
 
   const handleDelete=(id,catId)=>{
     const cid=catId||CATS.find(c=>items(c.id).some(i=>i.id===id))?.id;
     if(!cid) return;
     setData(d=>({...d,[cid]:(d[cid]||[]).filter(i=>i.id!==id)}));
-    setDetail(null);showT("Removed","🗑");
+    setDetail(null); showT("Removed","🗑");
   };
 
-  const bgUrl=spotTop?.item?.image||tops[0]?.item?.image||null;
-  const glows=tops.slice(0,5).map((t,i)=>{
+  const bgUrl = spotTop?.item?.image||tops[0]?.item?.image||null;
+  const glows = tops.slice(0,5).map((t,i)=>{
     const px=[{top:"-10%",left:"-5%"},{top:"-8%",right:"-5%"},{top:"25%",left:"40%"},{bottom:"0",right:"5%"},{bottom:"0",left:"5%"}];
     return{color:t.cat.color,pos:px[i]};
   });
 
+  if (loading) return (
+    <>
+      <style>{CSS}</style>
+      <div style={{height:"100vh",display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:16,background:"#000"}}>
+        <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:32,letterSpacing:".1em",color:"#1DB954"}}>SHUBHAM.WORLD</div>
+        <div className="ai-spin"><i/><i/><i/></div>
+      </div>
+    </>
+  );
+
   return (
     <>
       <style>{CSS}</style>
+
+      {/* Ambient BG */}
       <div className="bg-root">
         {bgUrl&&<div className="bg-img" style={{backgroundImage:`url(${bgUrl})`}}/>}
         <div className="bg-glows">
@@ -740,13 +757,14 @@ export default function App() {
         <div className="bg-darken"/>
       </div>
 
+      {/* Nav */}
       <nav className={`nav ${scrolled?"stuck":""}`}>
         <div className="logo">
-          {/* dot is clickable only for owner (to lock), invisible to others */}
           <div className={`logo-dot${isOwner?" owner-on":""}`}
             onClick={isOwner?lockOwner:undefined}
             title={isOwner?"Click to lock":""}/>
           SHUBHAM.WORLD
+          {saving&&<span style={{fontSize:10,color:"var(--green)",marginLeft:6,opacity:.7}}>saving…</span>}
         </div>
         <div className="nav-r">
           <SearchBar allItems={allItems}/>

@@ -3,6 +3,32 @@ import { useState, useEffect, useRef, useCallback } from "react";
 const GFONTS = `@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap');`;
 const FAVICON_B64 = "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";
 
+/* ─────────────────────────────────────────────
+   OWNER AUTH — Secret URL approach
+   Visit:  yoursite.com?s=shubham  → unlocks THIS device forever
+   Anyone else sees zero owner UI, no dot, no modal, nothing
+   To lock your own device: yoursite.com?s=lock
+───────────────────────────────────────────── */
+const OWNER_SECRET  = "shubham";          // your secret param value
+const OWNER_LS_KEY  = "sw-owner-v2";      // localStorage key
+
+const checkUrlOwner = () => {
+  const p = new URLSearchParams(window.location.search);
+  const s = p.get("s");
+  if (s === OWNER_SECRET) {
+    localStorage.setItem(OWNER_LS_KEY, "true");
+    // Clean URL so secret isn't visible in browser bar
+    window.history.replaceState({}, "", window.location.pathname);
+    return true;
+  }
+  if (s === "lock") {
+    localStorage.removeItem(OWNER_LS_KEY);
+    window.history.replaceState({}, "", window.location.pathname);
+    return false;
+  }
+  return localStorage.getItem(OWNER_LS_KEY) === "true";
+};
+
 const CATS = [
   { id:"movies",    label:"Movies",    icon:"🎞️",  color:"#E50914" },
   { id:"shows",     label:"TV Shows",  icon:"🖥️",  color:"#0071EB" },
@@ -15,34 +41,22 @@ const CATS = [
   { id:"habits",    label:"Habits",    icon:"🧠",  color:"#F5C518" },
 ];
 const SHAPE = { movies:"tall",shows:"tall",songs:"sq",articles:"wide",videos:"wide",actors:"tall",actresses:"tall",sports:"tall",habits:"wide" };
-const OWNER_PASS    = "#2023_faded";
-const OWNER_TOKEN   = "sw-owner-v1";   // localStorage key for persistent owner state
-const STORE_KEY     = "sw-v12";
-const RATINGS       = ["★ Liked","★★ Loved","★★★ Obsessed"];
+const STORE_KEY = "sw-v12";
+const RATINGS   = ["★ Liked","★★ Loved","★★★ Obsessed"];
 
-/* ── Storage ── */
-const dbGet   = () => { try { const r = localStorage.getItem(STORE_KEY); return r ? JSON.parse(r) : {}; } catch { return {}; } };
-const dbSet   = d  => { try { localStorage.setItem(STORE_KEY, JSON.stringify(d)); } catch {} };
-/* Owner token — set on this device after first unlock, persists across sessions */
-const isDeviceOwner = () => localStorage.getItem(OWNER_TOKEN) === "true";
-const setDeviceOwner = (v) => v ? localStorage.setItem(OWNER_TOKEN,"true") : localStorage.removeItem(OWNER_TOKEN);
+const dbGet = () => { try { const r=localStorage.getItem(STORE_KEY); return r?JSON.parse(r):{}; } catch{return{};} };
+const dbSet = d => { try { localStorage.setItem(STORE_KEY,JSON.stringify(d)); } catch{} };
 
-const score = (item, idx) => {
-  const w = {"★★★ Obsessed":3,"★★ Loved":2,"★ Liked":1}[item.rating] || 0;
-  return w * 10 + Math.max(0, 100 - idx * 3);
+const score = (item,idx) => {
+  const w={"★★★ Obsessed":3,"★★ Loved":2,"★ Liked":1}[item.rating]||0;
+  return w*10+Math.max(0,100-idx*3);
 };
 
-/* ── AI FILL — calls Netlify function proxy (no CORS issues) ── */
+/* AI FILL — calls Netlify function (fixes CORS) */
 const aiFill = async (name, catLabel, onStatus) => {
   onStatus?.("✨ Searching…");
-  /* In prod: /.netlify/functions/ai-fill  |  In dev (claude.ai): direct */
-  const isNetlify = typeof window !== "undefined" && !window.location.hostname.includes("claude.ai");
-  const endpoint  = isNetlify
-    ? "/.netlify/functions/claude"
-    : "https://api.anthropic.com/v1/messages";
-
   const payload = {
-    model: "claude-opus-4-5",
+    model: "claude-haiku-4-5-20251001",
     max_tokens: 900,
     system: "Pop-culture expert. Respond ONLY with valid JSON. No markdown, no prose.",
     messages: [{
@@ -52,45 +66,41 @@ const aiFill = async (name, catLabel, onStatus) => {
     }]
   };
 
-  const headers = { "Content-Type": "application/json" };
-  if (!isNetlify) headers["anthropic-version"] = "2023-06-01";
+  const res = await fetch("/.netlify/functions/claude", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
 
-  const res = await fetch(endpoint, { method:"POST", headers, body: JSON.stringify(payload) });
-  if (!res.ok) throw new Error(`Error ${res.status} — check Netlify env var ANTHROPIC_API_KEY`);
+  if (!res.ok) throw new Error(`Error ${res.status}`);
   const data = await res.json();
-  if (data.error) throw new Error(data.error.message || "API error");
+  if (data.error) throw new Error(data.error.message||"API error");
   onStatus?.("⚡ Processing…");
   const raw   = (data.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("").trim();
   const clean = raw.replace(/```[a-z]*\n?/gi,"").replace(/```/g,"").trim();
   const hits  = [...clean.matchAll(/\{[\s\S]*?\}/g)].map(m=>m[0]).sort((a,b)=>b.length-a.length);
   for (const c of hits) {
-    try { const o = JSON.parse(c); if (o.description||o.genre||o.imageUrl) return o; } catch {}
+    try { const o=JSON.parse(c); if(o.description||o.genre||o.imageUrl) return o; } catch{}
   }
   throw new Error("Could not parse response");
 };
 
-/* ══════════════════ CSS ══════════════════ */
 const CSS = `
 ${GFONTS}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{--black:#000;--bg:#0d0d0d;--card:#181818;--hover:#242424;--line:#2a2a2a;--green:#1DB954;--green-h:#1ED760;--t1:#fff;--t2:#B3B3B3;--t3:#6A6A6A;--gold:#F5C518;--red:#E50914;}
 html,body{background:var(--black);color:var(--t1);font-family:'DM Sans',sans-serif;overflow-x:hidden;}
 ::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px;}
-
-/* ── AMBIENT BG ── */
 .bg-root{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
 .bg-img{position:absolute;inset:-10%;background-size:cover;background-position:center;filter:blur(100px) brightness(.17) saturate(2.5);transform:scale(1.2);transition:background-image 1.5s ease;}
 .bg-glows{position:absolute;inset:0;}
 .bg-glow{position:absolute;border-radius:50%;filter:blur(90px);opacity:.15;transition:all 1.2s ease;}
 .bg-darken{position:absolute;inset:0;background:radial-gradient(ellipse 90% 70% at 50% 0%,transparent,rgba(0,0,0,.78) 100%);}
-
-/* ── NAV ── */
 .nav{position:fixed;top:0;left:0;right:0;z-index:900;height:60px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;transition:background .4s;}
 .nav.stuck{background:rgba(6,6,6,.97);border-bottom:1px solid var(--line);}
 .logo{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.1em;display:flex;align-items:center;gap:8px;user-select:none;position:relative;z-index:1;}
-.logo-dot{width:10px;height:10px;border-radius:50%;background:var(--green);animation:gpulse 2.4s ease-in-out infinite;cursor:pointer;flex-shrink:0;}
-.logo-dot.tapped{animation:none;transform:scale(1.5);}
-.logo-dot.owner-on{background:#fff;animation:none;box-shadow:0 0 0 3px var(--green);}
+.logo-dot{width:10px;height:10px;border-radius:50%;background:var(--green);animation:gpulse 2.4s ease-in-out infinite;flex-shrink:0;}
+.logo-dot.owner-on{cursor:pointer;background:#fff;animation:none;box-shadow:0 0 0 3px var(--green);}
 @keyframes gpulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(29,185,84,.4)}50%{transform:scale(1.3);box-shadow:0 0 0 6px rgba(29,185,84,0)}}
 .nav-r{display:flex;align-items:center;gap:10px;position:relative;z-index:1;}
 .owner-pill{padding:4px 14px;border-radius:100px;background:var(--green);color:#000;font-size:11px;font-weight:800;letter-spacing:.06em;cursor:pointer;transition:background .2s;}
@@ -113,8 +123,6 @@ html,body{background:var(--black);color:var(--t1);font-family:'DM Sans',sans-ser
 .search-meta{font-size:11px;color:var(--t3);display:flex;gap:6px;align-items:center;margin-top:2px;}
 .sdot2{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
 .search-empty{padding:20px;text-align:center;color:var(--t3);font-size:13px;}
-
-/* ── SPOTLIGHT ── */
 .spot{height:100svh;min-height:600px;position:relative;overflow:hidden;}
 .spot-cover-bg{position:absolute;inset:0;background-size:cover;background-position:center 20%;filter:blur(2px) brightness(.32) saturate(1.5);transform:scale(1.06);transition:background-image .9s ease;z-index:0;}
 .spot-grad{position:absolute;inset:0;z-index:1;background:linear-gradient(to right,rgba(0,0,0,.9) 0%,rgba(0,0,0,.5) 52%,rgba(0,0,0,.06) 100%),linear-gradient(to top,rgba(0,0,0,.97) 0%,transparent 52%),linear-gradient(to bottom,rgba(0,0,0,.45) 0%,transparent 22%);}
@@ -155,16 +163,12 @@ html,body{background:var(--black);color:var(--t1);font-family:'DM Sans',sans-ser
 .spot-empty{height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;position:relative;z-index:2;}
 .spot-empty-h{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:.06em;color:var(--t3);}
 .spot-empty-s{font-size:14px;color:var(--t3);}
-
-/* ── STATS BAR ── */
 .stats-bar{background:rgba(255,255,255,.02);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:14px 36px;display:flex;align-items:center;gap:32px;overflow-x:auto;position:relative;z-index:2;}
 .stats-bar::-webkit-scrollbar{display:none;}
 .stat-item{display:flex;align-items:center;gap:8px;flex-shrink:0;}
 .stat-num{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.04em;color:var(--green);}
 .stat-lbl{font-size:11px;color:var(--t3);font-weight:600;letter-spacing:.06em;text-transform:uppercase;}
 .stat-div{width:1px;height:28px;background:var(--line);flex-shrink:0;}
-
-/* ── ROWS ── */
 .content{background:transparent;padding-bottom:80px;position:relative;z-index:2;}
 .nrow{padding-top:28px;}
 .nrow-hdr{display:flex;align-items:center;justify-content:space-between;padding:0 28px 12px;}
@@ -187,16 +191,12 @@ html,body{background:var(--black);color:var(--t1);font-family:'DM Sans',sans-ser
 .nrow-wrap:hover .narr{opacity:1;pointer-events:all;}.narr:hover{background:rgba(40,40,40,.98);}
 .narr-l{left:0;}.narr-r{right:0;}
 .nrow-empty{padding:2px 28px 28px;font-size:13px;color:var(--t3);}
-
-/* ── NETFLIX NUMBERED CARD ── */
 .rcard-wrap{display:flex;align-items:flex-end;flex-shrink:0;margin-right:10px;}
 .rcard-num{font-family:'Bebas Neue',sans-serif;font-size:112px;line-height:.82;letter-spacing:-4px;color:transparent;-webkit-text-stroke:2.5px rgba(155,155,155,.36);user-select:none;flex-shrink:0;margin-right:-22px;position:relative;z-index:0;}
 .rcard-wrap:nth-child(1) .rcard-num{-webkit-text-stroke:2.5px rgba(215,215,215,.55);}
 .rcard-wrap:nth-child(2) .rcard-num{-webkit-text-stroke:2.5px rgba(195,195,195,.47);}
 .rcard-wrap:nth-child(3) .rcard-num{-webkit-text-stroke:2.5px rgba(175,175,175,.42);}
 .rcard-wrap .nc{z-index:1;}
-
-/* ── CARD ── */
 .nc{flex-shrink:0;position:relative;cursor:pointer;border-radius:6px;transition:transform .28s cubic-bezier(.22,.61,.36,1),z-index 0s .28s;z-index:1;}
 .nc:hover{transform:scale(1.18);z-index:60;transition:transform .28s cubic-bezier(.22,.61,.36,1),z-index 0s 0s;}
 .nc.tall{width:130px;}.nc.sq{width:155px;}.nc.wide{width:230px;}
@@ -228,8 +228,6 @@ html,body{background:var(--black);color:var(--t1);font-family:'DM Sans',sans-ser
 .nc-add-plus{font-size:28px;line-height:1;transition:transform .35s cubic-bezier(.34,1.56,.64,1);}
 .nc-add:hover .nc-add-plus{transform:rotate(90deg) scale(1.1);}
 .nc-add-lbl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;}
-
-/* ── DETAIL MODAL ── */
 .det-bg{position:fixed;inset:0;z-index:950;background:rgba(0,0,0,.88);animation:fadeIn .18s ease;}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 .det-box{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:951;width:min(860px,95vw);max-height:90vh;background:var(--card);border:1px solid rgba(255,255,255,.1);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;animation:bPop .26s cubic-bezier(.34,1.56,.64,1);}
@@ -260,8 +258,6 @@ html,body{background:var(--black);color:var(--t1);font-family:'DM Sans',sans-ser
 .det-btn-w{background:#fff;color:#000;}.det-btn-w:hover{background:#e8e8e8;}
 .det-btn-g{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.12);}.det-btn-g:hover{background:rgba(255,255,255,.2);}
 .det-btn-d{background:transparent;color:var(--t3);border:1px solid var(--line);}.det-btn-d:hover{border-color:rgba(229,9,20,.4);color:#ff5555;}
-
-/* ── MODALS (no backdrop-filter = no lag) ── */
 .modal-bg{position:fixed;inset:0;z-index:980;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .15s ease;}
 .modal-box{background:var(--card);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:36px;width:100%;max-width:500px;max-height:92vh;overflow-y:auto;animation:slideUp .2s cubic-bezier(.22,.61,.36,1);}
 @keyframes slideUp{from{transform:translateY(18px);opacity:0}to{transform:none;opacity:1}}
@@ -303,14 +299,6 @@ html,body{background:var(--black);color:var(--t1);font-family:'DM Sans',sans-ser
 .img-prev-thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
 .img-prev-note{font-size:11px;color:var(--t3);line-height:1.55;}
 .img-prev-note b{color:var(--green);}.img-prev-note.err b{color:#ff8888;}
-.lm{max-width:320px;text-align:center;}
-.lm-e{font-size:48px;margin-bottom:14px;}
-.lm-h{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.08em;margin-bottom:8px;}
-.lm-s{font-size:13px;color:var(--t2);margin-bottom:22px;line-height:1.65;}
-.lm-err{color:#ff5555;font-size:12px;font-weight:700;margin-top:8px;}
-.lm-hint{font-size:11px;color:var(--t3);margin-top:14px;line-height:1.5;}
-.lm-device{background:rgba(29,185,84,.08);border:1px solid rgba(29,185,84,.2);border-radius:8px;padding:12px 14px;margin-bottom:18px;font-size:12px;color:var(--t2);line-height:1.6;}
-.lm-device b{color:var(--green);}
 .toast{position:fixed;bottom:28px;right:28px;z-index:9999;background:var(--hover);border:1px solid rgba(255,255,255,.12);border-radius:100px;padding:12px 20px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:10px;animation:tpop .26s cubic-bezier(.34,1.56,.64,1);box-shadow:0 16px 40px rgba(0,0,0,.7);}
 @keyframes tpop{from{transform:translateY(12px) scale(.95);opacity:0}to{transform:none;opacity:1}}
 .site-footer{text-align:center;padding:40px 0 20px;color:var(--t3);font-size:12px;line-height:1.8;}
@@ -328,8 +316,7 @@ html,body{background:var(--black);color:var(--t1);font-family:'DM Sans',sans-ser
 }
 `;
 
-/* ══════════════════ COMPONENTS ══════════════════ */
-
+/* ══════════ COMPONENTS ══════════ */
 const Toast = ({ msg, emoji }) => <div className="toast"><span>{emoji}</span>{msg}</div>;
 
 function ImgPreview({ src }) {
@@ -353,85 +340,46 @@ function ImgPreview({ src }) {
   );
 }
 
-/* Lock modal — password + device remember */
-function LockModal({ onClose, onUnlock }) {
-  const [pw, setPw] = useState(""), [err, setErr] = useState(false);
-  useEffect(() => {
-    const fn = e => e.key==="Escape" && onClose();
-    window.addEventListener("keydown", fn);
-    return () => window.removeEventListener("keydown", fn);
-  }, []);
-  const go = () => {
-    if (pw === OWNER_PASS) { onUnlock(); onClose(); }
-    else { setErr(true); setPw(""); setTimeout(() => setErr(false), 1800); }
-  };
-  return (
-    <div className="modal-bg" onClick={e=>e.target===e.currentTarget&&onClose()}>
-      <div className="modal-box lm">
-        <div className="lm-e">🔐</div>
-        <div className="lm-h">Owner Access</div>
-        <div className="lm-device">
-          <b>🔒 Device Recognition</b><br/>
-          Enter once → this device remembers you.<br/>
-          Other people's devices never get auto-access.
-        </div>
-        <div className="lm-s">Visitors browse — only Shubham edits.</div>
-        <input className="fi" type="password" value={pw}
-          onChange={e=>setPw(e.target.value)}
-          onKeyDown={e=>e.key==="Enter"&&go()}
-          placeholder="Password…" autoFocus/>
-        {err && <div className="lm-err">WRONG PASSWORD</div>}
-        <div className="mftr" style={{marginTop:20}}>
-          <button className="mc" onClick={onClose}>Back</button>
-          <button className="ms" onClick={go}>Unlock →</button>
-        </div>
-        <div className="lm-hint">Only Shubham knows the password.</div>
-      </div>
-    </div>
-  );
-}
-
-/* Add / Edit modal */
 function EditModal({ cat, edit, onClose, onSave }) {
-  const [name,    setName]    = useState(edit?.name||"");
-  const [link,    setLink]    = useState(edit?.link||"");
-  const [image,   setImage]   = useState(edit?.image||"");
-  const [desc,    setDesc]    = useState(edit?.desc||"");
-  const [fact,    setFact]    = useState(edit?.fact||"");
-  const [tagline, setTagline] = useState(edit?.tagline||"");
-  const [genre,   setGenre]   = useState(edit?.genre||"");
-  const [year,    setYear]    = useState(edit?.year||"");
-  const [rating,  setRating]  = useState(edit?.rating||"");
-  const [busy,    setBusy]    = useState(false);
-  const [aiSt,    setAiSt]    = useState(null);
+  const [name,setName]=useState(edit?.name||"");
+  const [link,setLink]=useState(edit?.link||"");
+  const [image,setImage]=useState(edit?.image||"");
+  const [desc,setDesc]=useState(edit?.desc||"");
+  const [fact,setFact]=useState(edit?.fact||"");
+  const [tagline,setTagline]=useState(edit?.tagline||"");
+  const [genre,setGenre]=useState(edit?.genre||"");
+  const [year,setYear]=useState(edit?.year||"");
+  const [rating,setRating]=useState(edit?.rating||"");
+  const [busy,setBusy]=useState(false);
+  const [aiSt,setAiSt]=useState(null);
 
-  useEffect(() => {
-    const fn = e => e.key==="Escape"&&!busy&&onClose();
-    window.addEventListener("keydown", fn);
-    return () => window.removeEventListener("keydown", fn);
-  }, [busy]);
+  useEffect(()=>{
+    const fn=e=>e.key==="Escape"&&!busy&&onClose();
+    window.addEventListener("keydown",fn);
+    return()=>window.removeEventListener("keydown",fn);
+  },[busy]);
 
-  const fill = async () => {
-    if (!name.trim()||busy) return;
+  const fill=async()=>{
+    if(!name.trim()||busy) return;
     setBusy(true); setAiSt({type:"loading",msg:"Looking it up…"});
     try {
-      const r = await aiFill(name.trim(), cat.label, msg=>setAiSt({type:"loading",msg}));
-      if (r.description) setDesc(r.description);
-      if (r.genre)       setGenre(r.genre);
-      if (r.year)        setYear(r.year);
-      if (r.fact)        setFact(r.fact);
-      if (r.tagline)     setTagline(r.tagline);
-      if (r.imageUrl)    setImage(r.imageUrl);
-      if (r.link)        setLink(r.link);
-      setAiSt({type:"ok",msg:"✓ Done! Check the image preview below."});
+      const r=await aiFill(name.trim(),cat.label,msg=>setAiSt({type:"loading",msg}));
+      if(r.description) setDesc(r.description);
+      if(r.genre) setGenre(r.genre);
+      if(r.year) setYear(r.year);
+      if(r.fact) setFact(r.fact);
+      if(r.tagline) setTagline(r.tagline);
+      if(r.imageUrl) setImage(r.imageUrl);
+      if(r.link) setLink(r.link);
+      setAiSt({type:"ok",msg:"✓ Done! Check image preview below."});
     } catch(e) {
       setAiSt({type:"err",msg:`⚠ ${e.message}`});
     }
     setBusy(false);
   };
 
-  const save = () => {
-    if (!name.trim()) return;
+  const save=()=>{
+    if(!name.trim()) return;
     onSave({name:name.trim(),link:link.trim(),image:image.trim(),
             desc:desc.trim(),fact:fact.trim(),tagline:tagline.trim(),
             genre:genre.trim(),year:year.trim(),rating});
@@ -446,8 +394,7 @@ function EditModal({ cat, edit, onClose, onSave }) {
         </div>
         <div className="fg">
           <label className="fl">Name *</label>
-          <input className="fi" value={name} onChange={e=>setName(e.target.value)}
-            placeholder={`Your favourite ${cat.label.toLowerCase()}…`}/>
+          <input className="fi" value={name} onChange={e=>setName(e.target.value)} placeholder={`Your favourite ${cat.label.toLowerCase()}…`}/>
         </div>
         <div className="ai-bar">
           <div className="ai-icon">✨</div>
@@ -455,42 +402,21 @@ function EditModal({ cat, edit, onClose, onSave }) {
             <div className="ai-title">AI Auto-Fill</div>
             <div className="ai-sub">Fills all fields + cover image via Claude AI</div>
           </div>
-          {busy
-            ? <div className="ai-spin"><i/><i/><i/></div>
-            : <button className="ai-btn" onClick={fill} disabled={!name.trim()}>
-                {edit?"Re-Fill ✨":"Auto Fill ✨"}
-              </button>
-          }
+          {busy?<div className="ai-spin"><i/><i/><i/></div>
+               :<button className="ai-btn" onClick={fill} disabled={!name.trim()}>{edit?"Re-Fill ✨":"Auto Fill ✨"}</button>}
         </div>
-        {aiSt && (
-          <div className={`ai-status ${aiSt.type}`}>
-            {aiSt.type==="loading"&&<div className="ai-spin" style={{marginRight:4}}><i/><i/><i/></div>}
-            {aiSt.msg}
-          </div>
-        )}
+        {aiSt&&<div className={`ai-status ${aiSt.type}`}>
+          {aiSt.type==="loading"&&<div className="ai-spin" style={{marginRight:4}}><i/><i/><i/></div>}
+          {aiSt.msg}
+        </div>}
         <div className="two">
-          <div className="fg" style={{marginBottom:0}}>
-            <label className="fl">Genre</label>
-            <input className="fi" value={genre} onChange={e=>setGenre(e.target.value)} placeholder="Drama, Action…"/>
-          </div>
-          <div className="fg" style={{marginBottom:0}}>
-            <label className="fl">Year</label>
-            <input className="fi" value={year} onChange={e=>setYear(e.target.value)} placeholder="2012"/>
-          </div>
+          <div className="fg" style={{marginBottom:0}}><label className="fl">Genre</label><input className="fi" value={genre} onChange={e=>setGenre(e.target.value)} placeholder="Drama, Action…"/></div>
+          <div className="fg" style={{marginBottom:0}}><label className="fl">Year</label><input className="fi" value={year} onChange={e=>setYear(e.target.value)} placeholder="2012"/></div>
         </div>
         <div style={{height:14}}/>
-        <div className="fg">
-          <label className="fl">Tagline / Quote</label>
-          <input className="fi" value={tagline} onChange={e=>setTagline(e.target.value)} placeholder="Most famous line…"/>
-        </div>
-        <div className="fg">
-          <label className="fl">Description</label>
-          <textarea className="ft" value={desc} onChange={e=>setDesc(e.target.value)} placeholder="Why you love it…"/>
-        </div>
-        <div className="fg">
-          <label className="fl">Fun Fact</label>
-          <input className="fi" value={fact} onChange={e=>setFact(e.target.value)} placeholder="One surprising fact…"/>
-        </div>
+        <div className="fg"><label className="fl">Tagline / Quote</label><input className="fi" value={tagline} onChange={e=>setTagline(e.target.value)} placeholder="Most famous line…"/></div>
+        <div className="fg"><label className="fl">Description</label><textarea className="ft" value={desc} onChange={e=>setDesc(e.target.value)} placeholder="Why you love it…"/></div>
+        <div className="fg"><label className="fl">Fun Fact</label><input className="fi" value={fact} onChange={e=>setFact(e.target.value)} placeholder="One surprising fact…"/></div>
         <div className="fg">
           <label className="fl">Link</label>
           <input className="fi" value={link} onChange={e=>setLink(e.target.value)} placeholder="https://…"/>
@@ -517,24 +443,22 @@ function EditModal({ cat, edit, onClose, onSave }) {
 }
 
 function Detail({ item, cat, isOwner, onClose, onEdit, onDelete }) {
-  const stars = item.rating==="★★★ Obsessed"?"★★★★★":item.rating==="★★ Loved"?"★★★★":"★★★";
-  useEffect(() => {
-    const fn = e => e.key==="Escape"&&onClose();
-    window.addEventListener("keydown", fn);
-    return () => window.removeEventListener("keydown", fn);
-  }, []);
+  const stars=item.rating==="★★★ Obsessed"?"★★★★★":item.rating==="★★ Loved"?"★★★★":"★★★";
+  useEffect(()=>{
+    const fn=e=>e.key==="Escape"&&onClose();
+    window.addEventListener("keydown",fn);
+    return()=>window.removeEventListener("keydown",fn);
+  },[]);
   return (
     <>
       <div className="det-bg" onClick={onClose}/>
       <div className="det-box">
         <div className="det-hero">
-          {item.image && <div className="det-hero-img" style={{backgroundImage:`url(${item.image})`}}/>}
+          {item.image&&<div className="det-hero-img" style={{backgroundImage:`url(${item.image})`}}/>}
           <div className="det-hero-grad"/>
           <div className="det-poster">
             <span style={{position:"relative",zIndex:0}}>{cat.icon}</span>
-            {item.image&&<img src={item.image} alt=""
-              style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",zIndex:1}}
-              onError={e=>e.target.style.display="none"}/>}
+            {item.image&&<img src={item.image} alt="" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",zIndex:1}} onError={e=>e.target.style.display="none"}/>}
           </div>
           <div className="det-actions">
             {isOwner&&<>
@@ -575,7 +499,7 @@ function Detail({ item, cat, isOwner, onClose, onEdit, onDelete }) {
 }
 
 function NC({ item, cat, isOwner, onOpen, onEdit, onDelete }) {
-  const sh = SHAPE[cat.id]||"tall";
+  const sh=SHAPE[cat.id]||"tall";
   return (
     <div className={`nc ${sh}`}>
       <div className="nc-img-box">
@@ -605,10 +529,10 @@ function NC({ item, cat, isOwner, onOpen, onEdit, onDelete }) {
 }
 
 function NRow({ cat, items, isOwner, onOpen, onEdit, onDelete, onAdd }) {
-  const ref = useRef(null);
-  const [sort, setSort] = useState("default");
-  const scroll = d => ref.current?.scrollBy({left:d*420,behavior:"smooth"});
-  const sorted = [...items].sort((a,b)=>{
+  const ref=useRef(null);
+  const [sort,setSort]=useState("default");
+  const scroll=d=>ref.current?.scrollBy({left:d*420,behavior:"smooth"});
+  const sorted=[...items].sort((a,b)=>{
     if(sort==="rating"){const w={"★★★ Obsessed":3,"★★ Loved":2,"★ Liked":1};return(w[b.rating]||0)-(w[a.rating]||0);}
     if(sort==="year") return(parseInt(b.year)||0)-(parseInt(a.year)||0);
     return 0;
@@ -647,30 +571,28 @@ function NRow({ cat, items, isOwner, onOpen, onEdit, onDelete, onAdd }) {
 }
 
 function Spotlight({ tops, isOwner, onOpen, onAdd, onSpotChange }) {
-  const [idx, setIdx]   = useState(0);
-  const [aKey, setAKey] = useState(0);
-  const timer = useRef(null);
-  const goTo  = useCallback(i => { clearTimeout(timer.current); setIdx(i); setAKey(k=>k+1); }, []);
-  useEffect(() => {
-    if (!tops.length) return;
+  const [idx,setIdx]=useState(0);
+  const [aKey,setAKey]=useState(0);
+  const timer=useRef(null);
+  const goTo=useCallback(i=>{clearTimeout(timer.current);setIdx(i);setAKey(k=>k+1);},[]);
+  useEffect(()=>{
+    if(!tops.length) return;
     onSpotChange?.(tops[idx]);
-    timer.current = setTimeout(() => { const n=(idx+1)%tops.length; setIdx(n); setAKey(k=>k+1); }, 6000);
-    return () => clearTimeout(timer.current);
-  }, [idx, tops.length]);
-  useEffect(() => { if (tops[idx]) onSpotChange?.(tops[idx]); }, [idx]);
-  if (!tops.length) return (
+    timer.current=setTimeout(()=>{const n=(idx+1)%tops.length;setIdx(n);setAKey(k=>k+1);},6000);
+    return()=>clearTimeout(timer.current);
+  },[idx,tops.length]);
+  useEffect(()=>{if(tops[idx]) onSpotChange?.(tops[idx]);},[idx]);
+  if(!tops.length) return (
     <div className="spot-empty">
       <div style={{fontSize:72,opacity:.1}}>🌌</div>
       <div className="spot-empty-h">Your Vault Awaits</div>
-      <div className="spot-empty-s">{isOwner?"Tap the dot 5× to unlock.":"Nothing saved yet."}</div>
+      <div className="spot-empty-s">{isOwner?"Start adding your favourites below.":"Nothing saved yet."}</div>
     </div>
   );
-  const { item, cat } = tops[idx];
+  const {item,cat}=tops[idx];
   return (
     <div className="spot">
-      {/* Cover image = the actual hero background, cinematic */}
-      <div className="spot-cover-bg" key={`cb${idx}`}
-        style={{backgroundImage:item.image?`url(${item.image})`:"none"}}/>
+      <div className="spot-cover-bg" key={`cb${idx}`} style={{backgroundImage:item.image?`url(${item.image})`:"none"}}/>
       <div className="spot-grad"/>
       <div className="spot-body" key={aKey}>
         <div className="spot-left">
@@ -695,9 +617,7 @@ function Spotlight({ tops, isOwner, onOpen, onAdd, onSpotChange }) {
         <div className="spot-right">
           <div className="spot-poster" key={`p${idx}`}>
             <span style={{position:"relative",zIndex:0}}>{cat.icon}</span>
-            {item.image&&<img src={item.image} alt=""
-              style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",zIndex:1}}
-              onError={e=>e.target.style.display="none"}/>}
+            {item.image&&<img src={item.image} alt="" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",zIndex:1}} onError={e=>e.target.style.display="none"}/>}
           </div>
         </div>
       </div>
@@ -719,21 +639,22 @@ function Spotlight({ tops, isOwner, onOpen, onAdd, onSpotChange }) {
 function SearchBar({ allItems }) {
   const [q,setQ]=useState(""); const [open,setOpen]=useState(false); const [det,setDet]=useState(null);
   const ref=useRef(null);
-  useEffect(()=>{const fn=e=>{if(!ref.current?.contains(e.target))setOpen(false);}; document.addEventListener("mousedown",fn); return()=>document.removeEventListener("mousedown",fn);},[]);
+  useEffect(()=>{const fn=e=>{if(!ref.current?.contains(e.target))setOpen(false);};document.addEventListener("mousedown",fn);return()=>document.removeEventListener("mousedown",fn);},[]);
   const results=q.trim().length<2?[]:allItems.filter(({item})=>item.name.toLowerCase().includes(q.toLowerCase())||(item.genre||"").toLowerCase().includes(q.toLowerCase())).slice(0,8);
-  return(
+  return (
     <div className="nav-search" ref={ref}>
       <span className="nav-search-icon">🔍</span>
       <input className="nav-search-input" value={q} onChange={e=>{setQ(e.target.value);setOpen(true);}} onFocus={()=>setOpen(true)} placeholder="Search vault…"/>
       {q&&<button className="nav-search-clear" onClick={()=>{setQ("");setOpen(false);}}>×</button>}
       {open&&q.trim().length>=2&&(
         <div className="search-drop">
-          {results.length===0?<div className="search-empty">No results for "{q}"</div>:results.map(({item,cat})=>(
+          {results.length===0?<div className="search-empty">No results for "{q}"</div>
+          :results.map(({item,cat})=>(
             <div key={item.id} className="search-item" onClick={()=>{setDet({item,cat});setOpen(false);setQ("");}}>
               <div className="search-thumb"><span>{cat.icon}</span>{item.image&&<img src={item.image} alt="" onError={e=>e.target.style.display="none"}/>}</div>
               <div className="search-info">
                 <div className="search-name">{item.name}</div>
-                <div className="search-meta"><div className="sdot2" style={{background:cat.color}}/><span style={{color:cat.color,fontSize:10,fontWeight:700}}>{cat.label}</span>{item.year&&<span>{item.year}</span>}{item.rating&&<span>{item.rating.split(" ")[0]}</span>}</div>
+                <div className="search-meta"><div className="sdot2" style={{background:cat.color}}/><span style={{color:cat.color,fontSize:10,fontWeight:700}}>{cat.label}</span>{item.year&&<span>{item.year}</span>}</div>
               </div>
             </div>
           ))}
@@ -744,23 +665,20 @@ function SearchBar({ allItems }) {
   );
 }
 
-/* ══════════════════ APP ══════════════════ */
+/* ══════════ APP ══════════ */
 export default function App() {
-  const [data,    setData]    = useState(()=>dbGet());
-  /* Owner state — auto-restores from localStorage on page load */
-  const [isOwner, setIsOwner] = useState(()=>isDeviceOwner());
-  const [showLock,setShowLock]= useState(false);
-  const [showAdd, setShowAdd] = useState(false);
-  const [addCat,  setAddCat]  = useState(null);
+  const [data,setData]       = useState(()=>dbGet());
+  /* Owner = URL param or remembered device — no modal, no tap dance */
+  const [isOwner,setIsOwner] = useState(()=>checkUrlOwner());
+  const [showAdd,setShowAdd] = useState(false);
+  const [addCat,setAddCat]   = useState(null);
   const [editItem,setEditItem]= useState(null);
-  const [detail,  setDetail]  = useState(null);
-  const [toast,   setToast]   = useState(null);
+  const [detail,setDetail]   = useState(null);
+  const [toast,setToast]     = useState(null);
   const [scrolled,setScrolled]= useState(false);
-  const [dotTap,  setDotTap]  = useState(false);
-  const [spotTop, setSpotTop] = useState(null);
-  const tapCount=useRef(0); const tapTimer=useRef(null); const toastTimer=useRef(null);
+  const [spotTop,setSpotTop] = useState(null);
+  const toastTimer = useRef(null);
 
-  /* Favicon + title */
   useEffect(()=>{
     document.querySelectorAll("link[rel*='icon']").forEach(el=>el.remove());
     const lnk=document.createElement("link");
@@ -771,58 +689,49 @@ export default function App() {
   },[]);
 
   useEffect(()=>{dbSet(data);},[data]);
-  useEffect(()=>{const fn=()=>setScrolled(window.scrollY>60); window.addEventListener("scroll",fn); return()=>window.removeEventListener("scroll",fn);},[]);
+  useEffect(()=>{const fn=()=>setScrolled(window.scrollY>60);window.addEventListener("scroll",fn);return()=>window.removeEventListener("scroll",fn);},[]);
 
-  const showT=(m,e="✅")=>{setToast({msg:m,emoji:e}); clearTimeout(toastTimer.current); toastTimer.current=setTimeout(()=>setToast(null),2600);};
+  const showT=(m,e="✅")=>{setToast({msg:m,emoji:e});clearTimeout(toastTimer.current);toastTimer.current=setTimeout(()=>setToast(null),2600);};
 
-  /* 5 rapid taps to open lock modal */
-  const handleDot=()=>{
-    tapCount.current+=1; setDotTap(true); setTimeout(()=>setDotTap(false),160);
-    clearTimeout(tapTimer.current);
-    if(tapCount.current>=5){
-      tapCount.current=0;
-      if(isOwner){ setIsOwner(false); setDeviceOwner(false); showT("Vault locked","🔒"); }
-      else setShowLock(true);
-      return;
-    }
-    tapTimer.current=setTimeout(()=>{tapCount.current=0;},1800);
+  const lockOwner=()=>{
+    localStorage.removeItem(OWNER_LS_KEY);
+    setIsOwner(false);
+    showT("Vault locked","🔒");
   };
 
-  const items    = id => data[id]||[];
+  const items    = id=>data[id]||[];
   const allItems = CATS.flatMap(cat=>items(cat.id).map(item=>({item,cat})));
   const total    = allItems.length;
   const linked   = allItems.filter(({item})=>item.link).length;
   const obsessed = allItems.filter(({item})=>item.rating==="★★★ Obsessed").length;
   const tops     = allItems.map(({item,cat})=>({item,cat,sc:score(item,items(cat.id).indexOf(item))})).sort((a,b)=>b.sc-a.sc).slice(0,5);
 
-  const openAdd  = cat         => {setAddCat(cat);setEditItem(null);setShowAdd(true);};
-  const openEdit = (item,cat)  => {setAddCat(cat);setEditItem(item);setShowAdd(true);};
-  const openDet  = (item,cat)  => setDetail({item,cat});
+  const openAdd  = cat        =>{setAddCat(cat);setEditItem(null);setShowAdd(true);};
+  const openEdit = (item,cat) =>{setAddCat(cat);setEditItem(item);setShowAdd(true);};
+  const openDet  = (item,cat) =>setDetail({item,cat});
 
   const handleSave=vals=>{
-    if(editItem){setData(d=>({...d,[addCat.id]:(d[addCat.id]||[]).map(i=>i.id===editItem.id?{...i,...vals}:i)})); showT(`"${vals.name}" updated!`,"💾");}
-    else{setData(d=>({...d,[addCat.id]:[...(d[addCat.id]||[]),{...vals,id:Date.now().toString()}]})); showT(`"${vals.name}" added!`,addCat.icon);}
-    setShowAdd(false); setEditItem(null);
+    if(editItem){setData(d=>({...d,[addCat.id]:(d[addCat.id]||[]).map(i=>i.id===editItem.id?{...i,...vals}:i)}));showT(`"${vals.name}" updated!`,"💾");}
+    else{setData(d=>({...d,[addCat.id]:[...(d[addCat.id]||[]),{...vals,id:Date.now().toString()}]}));showT(`"${vals.name}" added!`,addCat.icon);}
+    setShowAdd(false);setEditItem(null);
   };
 
   const handleDelete=(id,catId)=>{
     const cid=catId||CATS.find(c=>items(c.id).some(i=>i.id===id))?.id;
     if(!cid) return;
     setData(d=>({...d,[cid]:(d[cid]||[]).filter(i=>i.id!==id)}));
-    setDetail(null); showT("Removed","🗑");
+    setDetail(null);showT("Removed","🗑");
   };
 
-  /* Ambient BG — blurred cover of current spotlight item */
-  const bgUrl = spotTop?.item?.image || tops[0]?.item?.image || null;
-  const glows = tops.slice(0,5).map((t,i)=>{
+  const bgUrl=spotTop?.item?.image||tops[0]?.item?.image||null;
+  const glows=tops.slice(0,5).map((t,i)=>{
     const px=[{top:"-10%",left:"-5%"},{top:"-8%",right:"-5%"},{top:"25%",left:"40%"},{bottom:"0",right:"5%"},{bottom:"0",left:"5%"}];
-    return {color:t.cat.color,pos:px[i]};
+    return{color:t.cat.color,pos:px[i]};
   });
 
   return (
     <>
       <style>{CSS}</style>
-      {/* Ambient background */}
       <div className="bg-root">
         {bgUrl&&<div className="bg-img" style={{backgroundImage:`url(${bgUrl})`}}/>}
         <div className="bg-glows">
@@ -831,15 +740,17 @@ export default function App() {
         <div className="bg-darken"/>
       </div>
 
-      {/* Nav */}
       <nav className={`nav ${scrolled?"stuck":""}`}>
         <div className="logo">
-          <div className={`logo-dot${dotTap?" tapped":""}${isOwner?" owner-on":""}`} onClick={handleDot}/>
+          {/* dot is clickable only for owner (to lock), invisible to others */}
+          <div className={`logo-dot${isOwner?" owner-on":""}`}
+            onClick={isOwner?lockOwner:undefined}
+            title={isOwner?"Click to lock":""}/>
           SHUBHAM.WORLD
         </div>
         <div className="nav-r">
           <SearchBar allItems={allItems}/>
-          {isOwner&&<div className="owner-pill" onClick={()=>{setIsOwner(false);setDeviceOwner(false);showT("Vault locked","🔒");}}>● OWNER</div>}
+          {isOwner&&<div className="owner-pill" onClick={lockOwner}>● OWNER</div>}
           <div className="nav-avatar">S</div>
         </div>
       </nav>
@@ -867,9 +778,6 @@ export default function App() {
         onClose={()=>setDetail(null)}
         onEdit={item=>{setDetail(null);openEdit(item,detail.cat);}}
         onDelete={handleDelete}/>}
-
-      {showLock&&<LockModal onClose={()=>setShowLock(false)}
-        onUnlock={()=>{setIsOwner(true);setDeviceOwner(true);showT("Swagat hai Shubham! 🎉","🔓");}}/>}
 
       {showAdd&&addCat&&isOwner&&<EditModal cat={addCat} edit={editItem}
         onClose={()=>{setShowAdd(false);setEditItem(null);}}

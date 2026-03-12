@@ -10,7 +10,7 @@ exports.handler = async (event) => {
     return {
       statusCode: 500,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ error: { message: "ANTHROPIC_API_KEY not set." } })
+      body: JSON.stringify({ error: { message: "ANTHROPIC_API_KEY not set in Netlify." } })
     };
   }
 

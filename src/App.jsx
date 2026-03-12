@@ -38,7 +38,7 @@ const aiFill = async (name, catLabel, onStatus) => {
   /* In prod: /.netlify/functions/ai-fill  |  In dev (claude.ai): direct */
   const isNetlify = typeof window !== "undefined" && !window.location.hostname.includes("claude.ai");
   const endpoint  = isNetlify
-    ? "/.netlify/functions/ai-fill"
+    ? "/.netlify/functions/claude"
     : "https://api.anthropic.com/v1/messages";
 
   const payload = {

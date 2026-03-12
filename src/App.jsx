@@ -1,12 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 
-/* ─── FONTS ─── */
 const GFONTS = `@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap');`;
-
-/* ─── TYRION FAVICON (32×32) ─── */
 const FAVICON_B64 = "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";
 
-/* ─── CATEGORIES ─── */
 const CATS = [
   { id:"movies",    label:"Movies",    icon:"🎞️",  color:"#E50914" },
   { id:"shows",     label:"TV Shows",  icon:"🖥️",  color:"#0071EB" },
@@ -18,99 +14,79 @@ const CATS = [
   { id:"sports",    label:"Athletes",  icon:"⚡",  color:"#00BFA5" },
   { id:"habits",    label:"Habits",    icon:"🧠",  color:"#F5C518" },
 ];
+const SHAPE = { movies:"tall",shows:"tall",songs:"sq",articles:"wide",videos:"wide",actors:"tall",actresses:"tall",sports:"tall",habits:"wide" };
+const OWNER_PASS    = "#2023_faded";
+const OWNER_TOKEN   = "sw-owner-v1";   // localStorage key for persistent owner state
+const STORE_KEY     = "sw-v12";
+const RATINGS       = ["★ Liked","★★ Loved","★★★ Obsessed"];
 
-const SHAPE = {
-  movies:"tall", shows:"tall", songs:"sq", articles:"wide",
-  videos:"wide", actors:"tall", actresses:"tall", sports:"tall", habits:"wide"
-};
+/* ── Storage ── */
+const dbGet   = () => { try { const r = localStorage.getItem(STORE_KEY); return r ? JSON.parse(r) : {}; } catch { return {}; } };
+const dbSet   = d  => { try { localStorage.setItem(STORE_KEY, JSON.stringify(d)); } catch {} };
+/* Owner token — set on this device after first unlock, persists across sessions */
+const isDeviceOwner = () => localStorage.getItem(OWNER_TOKEN) === "true";
+const setDeviceOwner = (v) => v ? localStorage.setItem(OWNER_TOKEN,"true") : localStorage.removeItem(OWNER_TOKEN);
 
-const OWNER_PASS = "#2023_faded";
-const RATINGS    = ["★ Liked","★★ Loved","★★★ Obsessed"];
-const STORE_KEY  = "sw-v12";
-const APIKEY_KEY = "sw-apikey";
-
-/* ─── Storage ─── */
-const dbGet = () => { try { const r = localStorage.getItem(STORE_KEY); return r ? JSON.parse(r) : {}; } catch { return {}; } };
-const dbSet = d  => { try { localStorage.setItem(STORE_KEY, JSON.stringify(d)); } catch {} };
-const getApiKey  = ()  => localStorage.getItem(APIKEY_KEY) || "";
-const saveApiKey = k   => localStorage.setItem(APIKEY_KEY, k);
-
-/* ─── Score ─── */
 const score = (item, idx) => {
-  const w = { "★★★ Obsessed":3, "★★ Loved":2, "★ Liked":1 }[item.rating] || 0;
+  const w = {"★★★ Obsessed":3,"★★ Loved":2,"★ Liked":1}[item.rating] || 0;
   return w * 10 + Math.max(0, 100 - idx * 3);
 };
 
-/* ─── AI FILL ─── */
-const aiFill = async (name, catLabel, apiKey, onStatus) => {
-  if (!apiKey) throw new Error("NO_KEY");
-  onStatus?.("✨ Searching knowledge base…");
-  const res = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "anthropic-version": "2023-06-01",
-      "x-api-key": apiKey,
-    },
-    body: JSON.stringify({
-      model: "claude-opus-4-5",
-      max_tokens: 900,
-      system: "You are a pop-culture expert. Respond ONLY with a single valid JSON object. Zero markdown fences, zero prose. Must parse cleanly with JSON.parse().",
-      messages: [{
-        role: "user",
-        content: `Give accurate details for: "${name}" (category: ${catLabel}).
-Return ONLY this JSON, nothing else:
-{"description":"2-3 engaging sentences about why it is iconic","genre":"1-3 word genre","year":"4-digit year or empty string","fact":"one surprising lesser-known fact","tagline":"most famous tagline or quote under 10 words or empty string","imageUrl":"a real direct image URL ending in .jpg .jpeg .png or .webp from Wikipedia Wikimedia TMDb or official source that a browser img tag can load","link":"best URL: Wikipedia IMDb Spotify YouTube or official site"}`
-      }]
-    })
-  });
-  if (res.status === 401) throw new Error("BAD_KEY");
-  if (!res.ok) throw new Error(`HTTP_${res.status}`);
+/* ── AI FILL — calls Netlify function proxy (no CORS issues) ── */
+const aiFill = async (name, catLabel, onStatus) => {
+  onStatus?.("✨ Searching…");
+  /* In prod: /.netlify/functions/ai-fill  |  In dev (claude.ai): direct */
+  const isNetlify = typeof window !== "undefined" && !window.location.hostname.includes("claude.ai");
+  const endpoint  = isNetlify
+    ? "/.netlify/functions/ai-fill"
+    : "https://api.anthropic.com/v1/messages";
+
+  const payload = {
+    model: "claude-opus-4-5",
+    max_tokens: 900,
+    system: "Pop-culture expert. Respond ONLY with valid JSON. No markdown, no prose.",
+    messages: [{
+      role: "user",
+      content: `Details for: "${name}" (category: ${catLabel}). Return ONLY this JSON:
+{"description":"2-3 engaging sentences","genre":"1-3 word genre","year":"4-digit year or empty","fact":"surprising fact","tagline":"famous quote under 10 words or empty","imageUrl":"real direct image URL ending .jpg .jpeg .png .webp from Wikipedia/Wikimedia/TMDb/official","link":"best URL: Wikipedia IMDb Spotify YouTube or official site"}`
+    }]
+  };
+
+  const headers = { "Content-Type": "application/json" };
+  if (!isNetlify) headers["anthropic-version"] = "2023-06-01";
+
+  const res = await fetch(endpoint, { method:"POST", headers, body: JSON.stringify(payload) });
+  if (!res.ok) throw new Error(`Error ${res.status} — check Netlify env var ANTHROPIC_API_KEY`);
   const data = await res.json();
-  if (data.error) throw new Error(data.error.message || "API_ERROR");
+  if (data.error) throw new Error(data.error.message || "API error");
   onStatus?.("⚡ Processing…");
-  const raw = (data.content || []).filter(b => b.type === "text").map(b => b.text).join("").trim();
-  const clean = raw.replace(/```[a-z]*\n?/gi, "").replace(/```/g, "").trim();
-  const candidates = [...clean.matchAll(/\{[\s\S]*?\}/g)].map(m => m[0]).sort((a,b) => b.length - a.length);
-  for (const c of candidates) {
-    try { const o = JSON.parse(c); if (o.description || o.genre || o.imageUrl) return o; } catch {}
+  const raw   = (data.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("").trim();
+  const clean = raw.replace(/```[a-z]*\n?/gi,"").replace(/```/g,"").trim();
+  const hits  = [...clean.matchAll(/\{[\s\S]*?\}/g)].map(m=>m[0]).sort((a,b)=>b.length-a.length);
+  for (const c of hits) {
+    try { const o = JSON.parse(c); if (o.description||o.genre||o.imageUrl) return o; } catch {}
   }
-  throw new Error("PARSE_FAIL");
+  throw new Error("Could not parse response");
 };
 
-
-/* ══════════════════════════ CSS ══════════════════════════ */
+/* ══════════════════ CSS ══════════════════ */
 const CSS = `
 ${GFONTS}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-:root{
-  --black:#000;--bg:#0d0d0d;--card:#181818;--hover:#242424;--line:#2a2a2a;
-  --green:#1DB954;--green-h:#1ED760;
-  --t1:#fff;--t2:#B3B3B3;--t3:#6A6A6A;
-  --gold:#F5C518;--red:#E50914;
-}
+:root{--black:#000;--bg:#0d0d0d;--card:#181818;--hover:#242424;--line:#2a2a2a;--green:#1DB954;--green-h:#1ED760;--t1:#fff;--t2:#B3B3B3;--t3:#6A6A6A;--gold:#F5C518;--red:#E50914;}
 html,body{background:var(--black);color:var(--t1);font-family:'DM Sans',sans-serif;overflow-x:hidden;}
-::-webkit-scrollbar{width:5px;height:5px;}
-::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px;}
+::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px;}
 
-/* ── AMBIENT BACKGROUND ── */
+/* ── AMBIENT BG ── */
 .bg-root{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
-.bg-img{
-  position:absolute;inset:-10%;
-  background-size:cover;background-position:center;
-  filter:blur(90px) brightness(.18) saturate(2.5);
-  transform:scale(1.2);
-  transition:background-image 1.4s ease;
-  will-change:background-image;
-}
+.bg-img{position:absolute;inset:-10%;background-size:cover;background-position:center;filter:blur(100px) brightness(.17) saturate(2.5);transform:scale(1.2);transition:background-image 1.5s ease;}
 .bg-glows{position:absolute;inset:0;}
-.bg-glow{position:absolute;border-radius:50%;filter:blur(80px);opacity:.18;transition:all 1s ease;}
-.bg-darken{position:absolute;inset:0;background:radial-gradient(ellipse 90% 70% at 50% 0%,transparent 0%,rgba(0,0,0,.72) 100%);}
+.bg-glow{position:absolute;border-radius:50%;filter:blur(90px);opacity:.15;transition:all 1.2s ease;}
+.bg-darken{position:absolute;inset:0;background:radial-gradient(ellipse 90% 70% at 50% 0%,transparent,rgba(0,0,0,.78) 100%);}
 
 /* ── NAV ── */
 .nav{position:fixed;top:0;left:0;right:0;z-index:900;height:60px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;transition:background .4s;}
-.nav.stuck{background:rgba(8,8,8,.97);border-bottom:1px solid var(--line);}
+.nav.stuck{background:rgba(6,6,6,.97);border-bottom:1px solid var(--line);}
 .logo{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.1em;display:flex;align-items:center;gap:8px;user-select:none;position:relative;z-index:1;}
 .logo-dot{width:10px;height:10px;border-radius:50%;background:var(--green);animation:gpulse 2.4s ease-in-out infinite;cursor:pointer;flex-shrink:0;}
 .logo-dot.tapped{animation:none;transform:scale(1.5);}
@@ -129,49 +105,35 @@ html,body{background:var(--black);color:var(--t1);font-family:'DM Sans',sans-ser
 .nav-search-clear:hover{color:#fff;}
 .search-drop{position:absolute;top:calc(100% + 8px);left:0;right:0;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.9);z-index:999;max-height:360px;overflow-y:auto;}
 .search-item{display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:pointer;transition:background .15s;border-bottom:1px solid var(--line);}
-.search-item:last-child{border-bottom:none;}
-.search-item:hover{background:var(--hover);}
+.search-item:last-child{border-bottom:none;}.search-item:hover{background:var(--hover);}
 .search-thumb{width:38px;height:38px;border-radius:5px;background:var(--hover);flex-shrink:0;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;font-size:16px;}
 .search-thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
 .search-info{flex:1;min-width:0;}
 .search-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .search-meta{font-size:11px;color:var(--t3);display:flex;gap:6px;align-items:center;margin-top:2px;}
-.search-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.sdot2{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
 .search-empty{padding:20px;text-align:center;color:var(--t3);font-size:13px;}
 
 /* ── SPOTLIGHT ── */
-.spot{height:100svh;min-height:600px;position:relative;overflow:hidden;background:transparent;}
-.spot-cover-bg{
-  position:absolute;inset:0;
-  background-size:cover;background-position:center 20%;
-  filter:blur(0px) brightness(.35) saturate(1.4);
-  transform:scale(1.05);
-  transition:background-image .8s ease;
-  z-index:0;
-}
-.spot-grad{
-  position:absolute;inset:0;z-index:1;
-  background:
-    linear-gradient(to right, rgba(0,0,0,.88) 0%, rgba(0,0,0,.55) 50%, rgba(0,0,0,.08) 100%),
-    linear-gradient(to top, rgba(0,0,0,.96) 0%, transparent 52%),
-    linear-gradient(to bottom, rgba(0,0,0,.45) 0%, transparent 22%);
-}
+.spot{height:100svh;min-height:600px;position:relative;overflow:hidden;}
+.spot-cover-bg{position:absolute;inset:0;background-size:cover;background-position:center 20%;filter:blur(2px) brightness(.32) saturate(1.5);transform:scale(1.06);transition:background-image .9s ease;z-index:0;}
+.spot-grad{position:absolute;inset:0;z-index:1;background:linear-gradient(to right,rgba(0,0,0,.9) 0%,rgba(0,0,0,.5) 52%,rgba(0,0,0,.06) 100%),linear-gradient(to top,rgba(0,0,0,.97) 0%,transparent 52%),linear-gradient(to bottom,rgba(0,0,0,.45) 0%,transparent 22%);}
 .spot-body{position:relative;z-index:2;height:100%;display:flex;align-items:center;padding:80px 60px 60px;gap:60px;}
 .spot-left{flex:1;max-width:620px;}
 .spot-kicker{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
 .spot-cat-tag{padding:5px 14px;border-radius:4px;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#000;}
 .spot-hot-tag{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:4px;background:rgba(29,185,84,.12);border:1px solid rgba(29,185,84,.4);font-size:10px;font-weight:800;letter-spacing:.08em;color:var(--green);}
 .spot-live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:gpulse 1.8s ease infinite;}
-.spot-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,8.5vw,108px);line-height:.88;letter-spacing:.02em;margin-bottom:18px;text-shadow:0 2px 30px rgba(0,0,0,.9);animation:sIn .46s cubic-bezier(.22,.61,.36,1) both;}
+.spot-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,8.5vw,108px);line-height:.88;letter-spacing:.02em;margin-bottom:18px;text-shadow:0 2px 30px rgba(0,0,0,.9);animation:sIn .44s cubic-bezier(.22,.61,.36,1) both;}
 @keyframes sIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
 .spot-meta{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
 .spot-year{font-size:13px;font-weight:700;color:var(--gold);}
 .spot-genre{padding:3px 10px;border-radius:3px;background:rgba(255,255,255,.1);font-size:12px;font-weight:600;color:var(--t2);}
-.spot-rating-badge{font-size:13px;color:var(--gold);}
+.spot-rb{font-size:13px;color:var(--gold);}
 .spot-sep{width:3px;height:3px;border-radius:50%;background:var(--t3);}
-.spot-tagline{font-size:14px;font-style:italic;color:var(--green);border-left:2px solid var(--green);padding-left:14px;margin-bottom:18px;line-height:1.55;animation:sIn .46s .08s cubic-bezier(.22,.61,.36,1) both;}
-.spot-desc{font-size:15px;color:var(--t2);line-height:1.65;max-width:500px;margin-bottom:32px;animation:sIn .46s .14s cubic-bezier(.22,.61,.36,1) both;}
-.spot-btns{display:flex;gap:12px;flex-wrap:wrap;animation:sIn .46s .19s cubic-bezier(.22,.61,.36,1) both;}
+.spot-tagline{font-size:14px;font-style:italic;color:var(--green);border-left:2px solid var(--green);padding-left:14px;margin-bottom:18px;line-height:1.55;animation:sIn .44s .08s cubic-bezier(.22,.61,.36,1) both;}
+.spot-desc{font-size:15px;color:var(--t2);line-height:1.65;max-width:500px;margin-bottom:32px;animation:sIn .44s .14s cubic-bezier(.22,.61,.36,1) both;}
+.spot-btns{display:flex;gap:12px;flex-wrap:wrap;animation:sIn .44s .19s cubic-bezier(.22,.61,.36,1) both;}
 .sp-btn-w{padding:13px 28px;border-radius:100px;border:none;background:#fff;color:#000;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;display:inline-flex;align-items:center;gap:8px;transition:all .2s;cursor:pointer;}
 .sp-btn-w:hover{background:#e8e8e8;transform:scale(1.03);}
 .sp-btn-g{padding:13px 28px;border-radius:100px;background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.15);font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;display:inline-flex;align-items:center;gap:8px;transition:all .2s;text-decoration:none;cursor:pointer;}
@@ -187,8 +149,8 @@ html,body{background:var(--black);color:var(--t1);font-family:'DM Sans',sans-ser
 .spot-nav{width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.15);color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all .2s;cursor:pointer;}
 .spot-nav:hover{background:rgba(255,255,255,.2);}
 .spot-right{flex-shrink:0;}
-.spot-poster{width:clamp(155px,16vw,240px);height:clamp(232px,24vw,360px);border-radius:16px;overflow:hidden;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:60px;box-shadow:0 30px 90px rgba(0,0,0,.95),0 0 0 1px rgba(255,255,255,.1);animation:pIn .6s .15s cubic-bezier(.22,.61,.36,1) both;position:relative;}
-@keyframes pIn{from{opacity:0;transform:translateX(28px) scale(.95)}to{opacity:1;transform:none}}
+.spot-poster{width:clamp(155px,16vw,240px);height:clamp(232px,24vw,360px);border-radius:16px;overflow:hidden;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:60px;box-shadow:0 30px 90px rgba(0,0,0,.95),0 0 0 1px rgba(255,255,255,.1);animation:pIn .58s .15s cubic-bezier(.22,.61,.36,1) both;position:relative;}
+@keyframes pIn{from{opacity:0;transform:translateX(26px) scale(.95)}to{opacity:1;transform:none}}
 .spot-poster img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;}
 .spot-empty{height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;position:relative;z-index:2;}
 .spot-empty-h{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:.06em;color:var(--t3);}
@@ -221,36 +183,26 @@ html,body{background:var(--black);color:var(--t1);font-family:'DM Sans',sans-ser
 .nrow-wrap::before{left:0;background:linear-gradient(to right,rgba(0,0,0,.95),transparent);}
 .nrow-wrap::after{right:0;background:linear-gradient(to left,rgba(0,0,0,.95),transparent);}
 .nrow-wrap:hover::before,.nrow-wrap:hover::after{opacity:1;}
-.narr{position:absolute;top:50%;transform:translateY(-65%);width:36px;height:72px;border-radius:4px;z-index:5;background:rgba(8,8,8,.95);border:1px solid rgba(255,255,255,.12);color:#fff;font-size:22px;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:all .2s;cursor:pointer;}
-.nrow-wrap:hover .narr{opacity:1;pointer-events:all;}
-.narr:hover{background:rgba(40,40,40,.98);}
+.narr{position:absolute;top:50%;transform:translateY(-65%);width:36px;height:72px;border-radius:4px;z-index:5;background:rgba(6,6,6,.95);border:1px solid rgba(255,255,255,.12);color:#fff;font-size:22px;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:all .2s;cursor:pointer;}
+.nrow-wrap:hover .narr{opacity:1;pointer-events:all;}.narr:hover{background:rgba(40,40,40,.98);}
 .narr-l{left:0;}.narr-r{right:0;}
 .nrow-empty{padding:2px 28px 28px;font-size:13px;color:var(--t3);}
 
 /* ── NETFLIX NUMBERED CARD ── */
 .rcard-wrap{display:flex;align-items:flex-end;flex-shrink:0;margin-right:10px;}
-.rcard-num{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:112px;line-height:.82;letter-spacing:-4px;
-  color:transparent;
-  -webkit-text-stroke:2.5px rgba(155,155,155,.36);
-  user-select:none;flex-shrink:0;
-  margin-right:-22px;position:relative;z-index:0;
-}
+.rcard-num{font-family:'Bebas Neue',sans-serif;font-size:112px;line-height:.82;letter-spacing:-4px;color:transparent;-webkit-text-stroke:2.5px rgba(155,155,155,.36);user-select:none;flex-shrink:0;margin-right:-22px;position:relative;z-index:0;}
 .rcard-wrap:nth-child(1) .rcard-num{-webkit-text-stroke:2.5px rgba(215,215,215,.55);}
 .rcard-wrap:nth-child(2) .rcard-num{-webkit-text-stroke:2.5px rgba(195,195,195,.47);}
 .rcard-wrap:nth-child(3) .rcard-num{-webkit-text-stroke:2.5px rgba(175,175,175,.42);}
 .rcard-wrap .nc{z-index:1;}
 
-/* ── NETFLIX CARD ── */
+/* ── CARD ── */
 .nc{flex-shrink:0;position:relative;cursor:pointer;border-radius:6px;transition:transform .28s cubic-bezier(.22,.61,.36,1),z-index 0s .28s;z-index:1;}
 .nc:hover{transform:scale(1.18);z-index:60;transition:transform .28s cubic-bezier(.22,.61,.36,1),z-index 0s 0s;}
 .nc.tall{width:130px;}.nc.sq{width:155px;}.nc.wide{width:230px;}
 .nc-img-box{width:100%;border-radius:6px;overflow:hidden;position:relative;box-shadow:0 4px 18px rgba(0,0,0,.6);transition:box-shadow .28s,border-radius .28s;}
 .nc:hover .nc-img-box{box-shadow:0 18px 50px rgba(0,0,0,.9);border-radius:6px 6px 0 0;}
-.nc.tall  .nc-img-box{padding-top:150%;}
-.nc.sq    .nc-img-box{padding-top:100%;}
-.nc.wide  .nc-img-box{padding-top:56.25%;}
+.nc.tall .nc-img-box{padding-top:150%;}.nc.sq .nc-img-box{padding-top:100%;}.nc.wide .nc-img-box{padding-top:56.25%;}
 .nc-ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:36px;background:linear-gradient(145deg,var(--card),var(--hover));}
 .nc-real-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:1;}
 .nc-star{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.85);border-radius:3px;padding:2px 6px;font-size:10px;font-weight:800;color:var(--gold);opacity:0;transition:opacity .2s;z-index:2;}
@@ -280,11 +232,11 @@ html,body{background:var(--black);color:var(--t1);font-family:'DM Sans',sans-ser
 /* ── DETAIL MODAL ── */
 .det-bg{position:fixed;inset:0;z-index:950;background:rgba(0,0,0,.88);animation:fadeIn .18s ease;}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.det-box{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:951;width:min(860px,95vw);max-height:90vh;background:var(--card);border:1px solid rgba(255,255,255,.1);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;animation:bPop .28s cubic-bezier(.34,1.56,.64,1);}
+.det-box{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:951;width:min(860px,95vw);max-height:90vh;background:var(--card);border:1px solid rgba(255,255,255,.1);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;animation:bPop .26s cubic-bezier(.34,1.56,.64,1);}
 @keyframes bPop{from{transform:translate(-50%,-50%) scale(.94);opacity:0}to{transform:translate(-50%,-50%) scale(1);opacity:1}}
 .det-hero{height:300px;position:relative;overflow:hidden;flex-shrink:0;background:var(--hover);}
-.det-hero-img{position:absolute;inset:0;background-size:cover;background-position:center 20%;filter:blur(0px) brightness(.38) saturate(1.6);transform:scale(1.05);transition:none;}
-.det-hero-grad{position:absolute;inset:0;background:linear-gradient(to right,rgba(24,24,24,.92),rgba(24,24,24,.45) 55%,rgba(24,24,24,.1)),linear-gradient(to top,var(--card),transparent 65%);}
+.det-hero-img{position:absolute;inset:0;background-size:cover;background-position:center 20%;filter:blur(1px) brightness(.35) saturate(1.6);transform:scale(1.05);}
+.det-hero-grad{position:absolute;inset:0;background:linear-gradient(to right,rgba(24,24,24,.92),rgba(24,24,24,.45) 55%,rgba(24,24,24,.08)),linear-gradient(to top,var(--card),transparent 65%);}
 .det-poster{position:absolute;left:36px;bottom:0;width:140px;height:210px;border-radius:8px 8px 0 0;overflow:hidden;background:var(--hover);box-shadow:0 -20px 60px rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;font-size:52px;}
 .det-poster img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;}
 .det-actions{position:absolute;top:14px;right:14px;display:flex;gap:8px;z-index:3;}
@@ -295,14 +247,13 @@ html,body{background:var(--black);color:var(--t1);font-family:'DM Sans',sans-ser
 .det-name{font-family:'Bebas Neue',sans-serif;font-size:clamp(30px,5vw,52px);letter-spacing:.02em;line-height:.92;margin-bottom:14px;}
 .det-imdb-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
 .imdb-box{background:var(--gold);color:#000;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:.1em;padding:3px 10px;border-radius:4px;}
-.imdb-stars{font-size:14px;color:var(--gold);}
-.imdb-lbl{font-size:12px;color:var(--t3);}
+.imdb-stars{font-size:14px;color:var(--gold);}.imdb-lbl{font-size:12px;color:var(--t3);}
 .det-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
 .chip{padding:4px 12px;border-radius:100px;font-size:12px;font-weight:600;background:rgba(255,255,255,.08);color:var(--t2);}
 .chip-y{background:rgba(245,197,24,.1);color:var(--gold);border:1px solid rgba(245,197,24,.2);}
 .det-tagline{font-size:14px;font-style:italic;color:var(--green);border-left:2px solid var(--green);padding-left:12px;margin-bottom:14px;line-height:1.55;}
 .det-desc{font-size:14px;color:var(--t2);line-height:1.75;margin-bottom:14px;}
-.det-fact{background:rgba(29,185,84,.07);border-radius:8px;padding:14px 16px;border-left:3px solid var(--green);font-size:13px;color:var(--t2);line-height:1.65;}
+.det-fact{background:rgba(29,185,84,.06);border-radius:8px;padding:14px 16px;border-left:3px solid var(--green);font-size:13px;color:var(--t2);line-height:1.65;}
 .det-fact-h{font-size:9px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--green);margin-bottom:5px;display:block;}
 .det-footer{flex-shrink:0;padding:16px 36px;border-top:1px solid var(--line);display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
 .det-btn{padding:10px 22px;border-radius:100px;border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;display:inline-flex;align-items:center;gap:6px;transition:all .2s;cursor:pointer;text-decoration:none;}
@@ -310,8 +261,8 @@ html,body{background:var(--black);color:var(--t1);font-family:'DM Sans',sans-ser
 .det-btn-g{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.12);}.det-btn-g:hover{background:rgba(255,255,255,.2);}
 .det-btn-d{background:transparent;color:var(--t3);border:1px solid var(--line);}.det-btn-d:hover{border-color:rgba(229,9,20,.4);color:#ff5555;}
 
-/* ── MODALS — no backdrop-filter (causes lag) ── */
-.modal-bg{position:fixed;inset:0;z-index:980;background:rgba(0,0,0,.90);display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .15s ease;}
+/* ── MODALS (no backdrop-filter = no lag) ── */
+.modal-bg{position:fixed;inset:0;z-index:980;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .15s ease;}
 .modal-box{background:var(--card);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:36px;width:100%;max-width:500px;max-height:92vh;overflow-y:auto;animation:slideUp .2s cubic-bezier(.22,.61,.36,1);}
 @keyframes slideUp{from{transform:translateY(18px);opacity:0}to{transform:none;opacity:1}}
 .mhdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;}
@@ -331,16 +282,6 @@ html,body{background:var(--black);color:var(--t1);font-family:'DM Sans',sans-ser
 @keyframes asd{0%,80%,100%{transform:scale(.55);opacity:.3}40%{transform:scale(1);opacity:1}}
 .ai-status{font-size:11px;padding:5px 2px 8px;display:flex;align-items:center;gap:6px;}
 .ai-status.ok{color:var(--green);}.ai-status.err{color:#ff8888;}.ai-status.loading{color:var(--t2);}
-.api-key-box{background:rgba(29,185,84,.07);border:1px solid rgba(29,185,84,.2);border-radius:8px;padding:14px 16px;margin-bottom:4px;}
-.api-key-label{font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--green);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
-.api-key-row{display:flex;gap:8px;align-items:center;}
-.api-key-input{flex:1;background:var(--hover);border:1px solid var(--line);border-radius:6px;padding:9px 12px;color:#fff;font-size:12px;font-family:'DM Sans',monospace;outline:none;transition:border-color .2s;}
-.api-key-input:focus{border-color:var(--green);}
-.api-key-input::placeholder{color:rgba(255,255,255,.18);}
-.api-key-save{padding:9px 16px;border-radius:6px;border:none;background:var(--green);color:#000;font-size:11px;font-weight:800;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all .2s;cursor:pointer;flex-shrink:0;}
-.api-key-save:hover{background:var(--green-h);}
-.api-key-note{font-size:10px;color:var(--t3);margin-top:7px;line-height:1.6;}
-.api-key-note a{color:var(--green);text-decoration:none;}.api-key-note a:hover{text-decoration:underline;}
 .fg{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
 .fl{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);}
 .fi,.ft{background:var(--hover);border:1px solid var(--line);border-radius:6px;padding:11px 14px;color:#fff;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;width:100%;}
@@ -368,7 +309,9 @@ html,body{background:var(--black);color:var(--t1);font-family:'DM Sans',sans-ser
 .lm-s{font-size:13px;color:var(--t2);margin-bottom:22px;line-height:1.65;}
 .lm-err{color:#ff5555;font-size:12px;font-weight:700;margin-top:8px;}
 .lm-hint{font-size:11px;color:var(--t3);margin-top:14px;line-height:1.5;}
-.toast{position:fixed;bottom:28px;right:28px;z-index:9999;background:var(--hover);border:1px solid rgba(255,255,255,.12);border-radius:100px;padding:12px 20px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:10px;animation:tpop .28s cubic-bezier(.34,1.56,.64,1);box-shadow:0 16px 40px rgba(0,0,0,.7);}
+.lm-device{background:rgba(29,185,84,.08);border:1px solid rgba(29,185,84,.2);border-radius:8px;padding:12px 14px;margin-bottom:18px;font-size:12px;color:var(--t2);line-height:1.6;}
+.lm-device b{color:var(--green);}
+.toast{position:fixed;bottom:28px;right:28px;z-index:9999;background:var(--hover);border:1px solid rgba(255,255,255,.12);border-radius:100px;padding:12px 20px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:10px;animation:tpop .26s cubic-bezier(.34,1.56,.64,1);box-shadow:0 16px 40px rgba(0,0,0,.7);}
 @keyframes tpop{from{transform:translateY(12px) scale(.95);opacity:0}to{transform:none;opacity:1}}
 .site-footer{text-align:center;padding:40px 0 20px;color:var(--t3);font-size:12px;line-height:1.8;}
 @media(max-width:900px){
@@ -385,11 +328,9 @@ html,body{background:var(--black);color:var(--t1);font-family:'DM Sans',sans-ser
 }
 `;
 
-/* ══════════════════════════ COMPONENTS ══════════════════════════ */
+/* ══════════════════ COMPONENTS ══════════════════ */
 
-function Toast({ msg, emoji }) {
-  return <div className="toast"><span>{emoji}</span>{msg}</div>;
-}
+const Toast = ({ msg, emoji }) => <div className="toast"><span>{emoji}</span>{msg}</div>;
 
 function ImgPreview({ src }) {
   const [ok, setOk] = useState(null);
@@ -400,53 +341,23 @@ function ImgPreview({ src }) {
       <div className="img-prev-thumb">
         <span>🖼</span>
         <img src={src} alt=""
-          style={ok === false ? { display:"none" } : { position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover" }}
-          onLoad={() => setOk(true)} onError={() => setOk(false)} />
+          style={ok===false?{display:"none"}:{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover"}}
+          onLoad={()=>setOk(true)} onError={()=>setOk(false)}/>
       </div>
-      <div className={`img-prev-note ${ok === false ? "err" : ""}`}>
-        {ok === null  && "Checking image…"}
-        {ok === true  && <><b>✓ Image looks good</b> — will show on cards</>}
-        {ok === false && <><b>✕ Can't load URL</b> — paste a direct .jpg/.png/.webp</>}
-      </div>
-    </div>
-  );
-}
-
-/* ── API Key Box (inside EditModal) ── */
-function ApiKeyBox({ onKeySaved }) {
-  const [k, setK] = useState(getApiKey());
-  const [saved, setSaved] = useState(false);
-  const save = () => {
-    const trimmed = k.trim();
-    if (!trimmed) return;
-    saveApiKey(trimmed);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
-    onKeySaved?.();
-  };
-  const existing = getApiKey();
-  return (
-    <div className="api-key-box">
-      <div className="api-key-label">🔑 Anthropic API Key {existing && <span style={{color:"var(--green)",fontSize:9}}>● SAVED</span>}</div>
-      <div className="api-key-row">
-        <input className="api-key-input" type="password" value={k}
-          onChange={e => setK(e.target.value)}
-          placeholder="sk-ant-…"
-          onKeyDown={e => e.key === "Enter" && save()} />
-        <button className="api-key-save" onClick={save}>{saved ? "✓ Saved!" : "Save"}</button>
-      </div>
-      <div className="api-key-note">
-        Required for AI fill on your live site. Key stored only in your browser.<br/>
-        Get yours at <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noreferrer">console.anthropic.com</a>
+      <div className={`img-prev-note ${ok===false?"err":""}`}>
+        {ok===null&&"Checking image…"}
+        {ok===true&&<><b>✓ Image looks good</b></>}
+        {ok===false&&<><b>✕ Can't load this URL</b> — try a direct .jpg or .png link</>}
       </div>
     </div>
   );
 }
 
+/* Lock modal — password + device remember */
 function LockModal({ onClose, onUnlock }) {
   const [pw, setPw] = useState(""), [err, setErr] = useState(false);
   useEffect(() => {
-    const fn = e => e.key === "Escape" && onClose();
+    const fn = e => e.key==="Escape" && onClose();
     window.addEventListener("keydown", fn);
     return () => window.removeEventListener("keydown", fn);
   }, []);
@@ -455,17 +366,22 @@ function LockModal({ onClose, onUnlock }) {
     else { setErr(true); setPw(""); setTimeout(() => setErr(false), 1800); }
   };
   return (
-    <div className="modal-bg" onClick={e => e.target === e.currentTarget && onClose()}>
+    <div className="modal-bg" onClick={e=>e.target===e.currentTarget&&onClose()}>
       <div className="modal-box lm">
         <div className="lm-e">🔐</div>
         <div className="lm-h">Owner Access</div>
-        <div className="lm-s">Shubham's vault.<br/>Visitors browse — only he edits.</div>
+        <div className="lm-device">
+          <b>🔒 Device Recognition</b><br/>
+          Enter once → this device remembers you.<br/>
+          Other people's devices never get auto-access.
+        </div>
+        <div className="lm-s">Visitors browse — only Shubham edits.</div>
         <input className="fi" type="password" value={pw}
-          onChange={e => setPw(e.target.value)}
-          onKeyDown={e => e.key === "Enter" && go()}
-          placeholder="Password…" autoFocus />
+          onChange={e=>setPw(e.target.value)}
+          onKeyDown={e=>e.key==="Enter"&&go()}
+          placeholder="Password…" autoFocus/>
         {err && <div className="lm-err">WRONG PASSWORD</div>}
-        <div className="mftr" style={{ marginTop:20 }}>
+        <div className="mftr" style={{marginTop:20}}>
           <button className="mc" onClick={onClose}>Back</button>
           <button className="ms" onClick={go}>Unlock →</button>
         </div>
@@ -475,34 +391,31 @@ function LockModal({ onClose, onUnlock }) {
   );
 }
 
+/* Add / Edit modal */
 function EditModal({ cat, edit, onClose, onSave }) {
-  const [name,    setName]    = useState(edit?.name    || "");
-  const [link,    setLink]    = useState(edit?.link    || "");
-  const [image,   setImage]   = useState(edit?.image   || "");
-  const [desc,    setDesc]    = useState(edit?.desc    || "");
-  const [fact,    setFact]    = useState(edit?.fact    || "");
-  const [tagline, setTagline] = useState(edit?.tagline || "");
-  const [genre,   setGenre]   = useState(edit?.genre   || "");
-  const [year,    setYear]    = useState(edit?.year    || "");
-  const [rating,  setRating]  = useState(edit?.rating  || "");
+  const [name,    setName]    = useState(edit?.name||"");
+  const [link,    setLink]    = useState(edit?.link||"");
+  const [image,   setImage]   = useState(edit?.image||"");
+  const [desc,    setDesc]    = useState(edit?.desc||"");
+  const [fact,    setFact]    = useState(edit?.fact||"");
+  const [tagline, setTagline] = useState(edit?.tagline||"");
+  const [genre,   setGenre]   = useState(edit?.genre||"");
+  const [year,    setYear]    = useState(edit?.year||"");
+  const [rating,  setRating]  = useState(edit?.rating||"");
   const [busy,    setBusy]    = useState(false);
   const [aiSt,    setAiSt]    = useState(null);
-  const [apiKey,  setApiKey]  = useState(getApiKey());
 
   useEffect(() => {
-    const fn = e => e.key === "Escape" && !busy && onClose();
+    const fn = e => e.key==="Escape"&&!busy&&onClose();
     window.addEventListener("keydown", fn);
     return () => window.removeEventListener("keydown", fn);
   }, [busy]);
 
   const fill = async () => {
-    const key = apiKey || getApiKey();
-    if (!key) { setAiSt({ type:"err", msg:"⚠ Enter your Anthropic API key above first." }); return; }
-    if (!name.trim() || busy) return;
-    setBusy(true);
-    setAiSt({ type:"loading", msg:"Looking it up…" });
+    if (!name.trim()||busy) return;
+    setBusy(true); setAiSt({type:"loading",msg:"Looking it up…"});
     try {
-      const r = await aiFill(name.trim(), cat.label, key, msg => setAiSt({ type:"loading", msg }));
+      const r = await aiFill(name.trim(), cat.label, msg=>setAiSt({type:"loading",msg}));
       if (r.description) setDesc(r.description);
       if (r.genre)       setGenre(r.genre);
       if (r.year)        setYear(r.year);
@@ -510,72 +423,78 @@ function EditModal({ cat, edit, onClose, onSave }) {
       if (r.tagline)     setTagline(r.tagline);
       if (r.imageUrl)    setImage(r.imageUrl);
       if (r.link)        setLink(r.link);
-      setAiSt({ type:"ok", msg:"✓ All fields filled! Check image preview below." });
+      setAiSt({type:"ok",msg:"✓ Done! Check the image preview below."});
     } catch(e) {
-      if (e.message === "NO_KEY")   setAiSt({ type:"err", msg:"⚠ Enter your Anthropic API key above." });
-      else if (e.message === "BAD_KEY") setAiSt({ type:"err", msg:"⚠ Invalid API key — double-check it." });
-      else setAiSt({ type:"err", msg:`⚠ ${e.message}` });
+      setAiSt({type:"err",msg:`⚠ ${e.message}`});
     }
     setBusy(false);
   };
 
   const save = () => {
     if (!name.trim()) return;
-    onSave({ name:name.trim(), link:link.trim(), image:image.trim(),
-             desc:desc.trim(), fact:fact.trim(), tagline:tagline.trim(),
-             genre:genre.trim(), year:year.trim(), rating });
+    onSave({name:name.trim(),link:link.trim(),image:image.trim(),
+            desc:desc.trim(),fact:fact.trim(),tagline:tagline.trim(),
+            genre:genre.trim(),year:year.trim(),rating});
   };
 
   return (
-    <div className="modal-bg" onClick={e => e.target === e.currentTarget && !busy && onClose()}>
+    <div className="modal-bg" onClick={e=>e.target===e.currentTarget&&!busy&&onClose()}>
       <div className="modal-box">
         <div className="mhdr">
-          <div className="mtitle">{edit ? `Edit · ${edit.name.slice(0,22)}` : `Add · ${cat.label}`}</div>
+          <div className="mtitle">{edit?`Edit · ${edit.name.slice(0,22)}`:`Add · ${cat.label}`}</div>
           <button className="mclose" onClick={onClose} disabled={busy}>×</button>
         </div>
-
         <div className="fg">
           <label className="fl">Name *</label>
-          <input className="fi" value={name} onChange={e => setName(e.target.value)}
-            placeholder={`Your favourite ${cat.label.toLowerCase()}…`} />
+          <input className="fi" value={name} onChange={e=>setName(e.target.value)}
+            placeholder={`Your favourite ${cat.label.toLowerCase()}…`}/>
         </div>
-
-        {/* API key — only shown if not already saved */}
-        {!apiKey && <ApiKeyBox onKeySaved={() => setApiKey(getApiKey())} />}
-
-        {/* AI Fill */}
         <div className="ai-bar">
           <div className="ai-icon">✨</div>
           <div className="ai-text">
             <div className="ai-title">AI Auto-Fill</div>
-            <div className="ai-sub">{apiKey ? "Fills all fields + image via Claude AI" : "Needs API key (see above)"}</div>
+            <div className="ai-sub">Fills all fields + cover image via Claude AI</div>
           </div>
           {busy
             ? <div className="ai-spin"><i/><i/><i/></div>
             : <button className="ai-btn" onClick={fill} disabled={!name.trim()}>
-                {edit ? "Re-Fill ✨" : "Auto Fill ✨"}
+                {edit?"Re-Fill ✨":"Auto Fill ✨"}
               </button>
           }
         </div>
         {aiSt && (
           <div className={`ai-status ${aiSt.type}`}>
-            {aiSt.type === "loading" && <div className="ai-spin" style={{marginRight:4}}><i/><i/><i/></div>}
+            {aiSt.type==="loading"&&<div className="ai-spin" style={{marginRight:4}}><i/><i/><i/></div>}
             {aiSt.msg}
           </div>
         )}
-
         <div className="two">
-          <div className="fg" style={{marginBottom:0}}><label className="fl">Genre</label><input className="fi" value={genre} onChange={e=>setGenre(e.target.value)} placeholder="Drama, Action…"/></div>
-          <div className="fg" style={{marginBottom:0}}><label className="fl">Year</label><input className="fi" value={year} onChange={e=>setYear(e.target.value)} placeholder="2012"/></div>
+          <div className="fg" style={{marginBottom:0}}>
+            <label className="fl">Genre</label>
+            <input className="fi" value={genre} onChange={e=>setGenre(e.target.value)} placeholder="Drama, Action…"/>
+          </div>
+          <div className="fg" style={{marginBottom:0}}>
+            <label className="fl">Year</label>
+            <input className="fi" value={year} onChange={e=>setYear(e.target.value)} placeholder="2012"/>
+          </div>
         </div>
         <div style={{height:14}}/>
-        <div className="fg"><label className="fl">Tagline / Quote</label><input className="fi" value={tagline} onChange={e=>setTagline(e.target.value)} placeholder="Most famous line…"/></div>
-        <div className="fg"><label className="fl">Description</label><textarea className="ft" value={desc} onChange={e=>setDesc(e.target.value)} placeholder="Why you love it…"/></div>
-        <div className="fg"><label className="fl">Fun Fact</label><input className="fi" value={fact} onChange={e=>setFact(e.target.value)} placeholder="One surprising fact…"/></div>
+        <div className="fg">
+          <label className="fl">Tagline / Quote</label>
+          <input className="fi" value={tagline} onChange={e=>setTagline(e.target.value)} placeholder="Most famous line…"/>
+        </div>
+        <div className="fg">
+          <label className="fl">Description</label>
+          <textarea className="ft" value={desc} onChange={e=>setDesc(e.target.value)} placeholder="Why you love it…"/>
+        </div>
+        <div className="fg">
+          <label className="fl">Fun Fact</label>
+          <input className="fi" value={fact} onChange={e=>setFact(e.target.value)} placeholder="One surprising fact…"/>
+        </div>
         <div className="fg">
           <label className="fl">Link</label>
           <input className="fi" value={link} onChange={e=>setLink(e.target.value)} placeholder="https://…"/>
-          {link && <a href={link} target="_blank" rel="noopener noreferrer" style={{fontSize:11,color:"var(--green)",marginTop:4,display:"inline-block"}}>↗ Test link</a>}
+          {link&&<a href={link} target="_blank" rel="noreferrer" style={{fontSize:11,color:"var(--green)",marginTop:4,display:"inline-block"}}>↗ Test link</a>}
         </div>
         <div className="fg">
           <label className="fl">Cover Image URL</label>
@@ -585,19 +504,12 @@ function EditModal({ cat, edit, onClose, onSave }) {
         <div className="fg">
           <label className="fl">Your Rating</label>
           <div className="rrow">
-            {RATINGS.map(r => <div key={r} className={`ropt ${rating===r?"on":""}`} onClick={() => setRating(rating===r?"":r)}>{r}</div>)}
+            {RATINGS.map(r=><div key={r} className={`ropt ${rating===r?"on":""}`} onClick={()=>setRating(rating===r?"":r)}>{r}</div>)}
           </div>
         </div>
-        {/* Show API key manager if already saved (to update) */}
-        {apiKey && (
-          <details style={{marginBottom:14}}>
-            <summary style={{fontSize:11,color:"var(--t3)",cursor:"pointer",userSelect:"none"}}>🔑 Change API Key</summary>
-            <div style={{marginTop:10}}><ApiKeyBox onKeySaved={() => setApiKey(getApiKey())} /></div>
-          </details>
-        )}
         <div className="mftr">
           <button className="mc" onClick={onClose} disabled={busy}>Cancel</button>
-          <button className="ms" onClick={save} disabled={!name.trim() || busy}>{edit ? "Save Changes" : "Add →"}</button>
+          <button className="ms" onClick={save} disabled={!name.trim()||busy}>{edit?"Save Changes":"Add →"}</button>
         </div>
       </div>
     </div>
@@ -607,7 +519,7 @@ function EditModal({ cat, edit, onClose, onSave }) {
 function Detail({ item, cat, isOwner, onClose, onEdit, onDelete }) {
   const stars = item.rating==="★★★ Obsessed"?"★★★★★":item.rating==="★★ Loved"?"★★★★":"★★★";
   useEffect(() => {
-    const fn = e => e.key === "Escape" && onClose();
+    const fn = e => e.key==="Escape"&&onClose();
     window.addEventListener("keydown", fn);
     return () => window.removeEventListener("keydown", fn);
   }, []);
@@ -616,23 +528,18 @@ function Detail({ item, cat, isOwner, onClose, onEdit, onDelete }) {
       <div className="det-bg" onClick={onClose}/>
       <div className="det-box">
         <div className="det-hero">
-          {/* cover image fills the full hero as blurred background */}
-          {item.image && (
-            <div className="det-hero-img" style={{ backgroundImage:`url(${item.image})` }}/>
-          )}
+          {item.image && <div className="det-hero-img" style={{backgroundImage:`url(${item.image})`}}/>}
           <div className="det-hero-grad"/>
           <div className="det-poster">
             <span style={{position:"relative",zIndex:0}}>{cat.icon}</span>
-            {item.image && <img src={item.image} alt=""
+            {item.image&&<img src={item.image} alt=""
               style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",zIndex:1}}
               onError={e=>e.target.style.display="none"}/>}
           </div>
           <div className="det-actions">
-            {isOwner && <>
-              <button className="det-x" style={{background:"rgba(245,197,24,.2)",color:"#F5C518"}}
-                onClick={()=>{onClose();onEdit(item);}}>✏️</button>
-              <button className="det-x" style={{background:"rgba(229,9,20,.2)",color:"#ff5555"}}
-                onClick={()=>{if(window.confirm("Remove this item?")) onDelete(item.id);}}>🗑</button>
+            {isOwner&&<>
+              <button className="det-x" style={{background:"rgba(245,197,24,.2)",color:"#F5C518"}} onClick={()=>{onClose();onEdit(item);}}>✏️</button>
+              <button className="det-x" style={{background:"rgba(229,9,20,.2)",color:"#ff5555"}} onClick={()=>{if(window.confirm("Remove?")) onDelete(item.id);}}>🗑</button>
             </>}
             <button className="det-x" onClick={onClose}>✕</button>
           </div>
@@ -646,17 +553,17 @@ function Detail({ item, cat, isOwner, onClose, onEdit, onDelete }) {
             <div className="imdb-lbl">Shubham's Pick</div>
           </div>
           <div className="det-chips">
-            {item.genre  && <span className="chip">{item.genre}</span>}
-            {item.year   && <span className="chip chip-y">{item.year}</span>}
-            {item.rating && <span className="chip chip-y">{item.rating}</span>}
+            {item.genre&&<span className="chip">{item.genre}</span>}
+            {item.year&&<span className="chip chip-y">{item.year}</span>}
+            {item.rating&&<span className="chip chip-y">{item.rating}</span>}
           </div>
-          {item.tagline && <div className="det-tagline">"{item.tagline}"</div>}
-          {item.desc    && <div className="det-desc">{item.desc}</div>}
-          {item.fact    && <div className="det-fact"><span className="det-fact-h">💡 Did You Know</span>{item.fact}</div>}
+          {item.tagline&&<div className="det-tagline">"{item.tagline}"</div>}
+          {item.desc&&<div className="det-desc">{item.desc}</div>}
+          {item.fact&&<div className="det-fact"><span className="det-fact-h">💡 Did You Know</span>{item.fact}</div>}
         </div>
         <div className="det-footer">
-          {item.link && <a className="det-btn det-btn-w" href={item.link} target="_blank" rel="noopener noreferrer">▶ Open Link</a>}
-          {isOwner && <>
+          {item.link&&<a className="det-btn det-btn-w" href={item.link} target="_blank" rel="noreferrer">▶ Open Link</a>}
+          {isOwner&&<>
             <button className="det-btn det-btn-g" onClick={()=>{onClose();onEdit(item);}}>✏ Edit</button>
             <button className="det-btn det-btn-d" onClick={()=>{if(window.confirm("Remove?")) onDelete(item.id);}}>🗑 Remove</button>
           </>}
@@ -668,27 +575,27 @@ function Detail({ item, cat, isOwner, onClose, onEdit, onDelete }) {
 }
 
 function NC({ item, cat, isOwner, onOpen, onEdit, onDelete }) {
-  const sh = SHAPE[cat.id] || "tall";
+  const sh = SHAPE[cat.id]||"tall";
   return (
     <div className={`nc ${sh}`}>
       <div className="nc-img-box">
         <div className="nc-ph">{cat.icon}</div>
-        {item.image && <img src={item.image} alt="" className="nc-real-img" onError={e=>e.target.style.display="none"}/>}
-        {item.rating && <div className="nc-star">{item.rating.split(" ")[0]}</div>}
+        {item.image&&<img src={item.image} alt="" className="nc-real-img" onError={e=>e.target.style.display="none"}/>}
+        {item.rating&&<div className="nc-star">{item.rating.split(" ")[0]}</div>}
       </div>
       <div className="nc-panel">
         <div className="nc-panel-title">{item.name}</div>
         <div className="nc-panel-meta">
-          {item.year  && <span className="npm-yr">{item.year}</span>}
-          {item.year && item.genre && <span className="npm-dot"/>}
-          {item.genre && <span className="npm-g">{item.genre}</span>}
+          {item.year&&<span className="npm-yr">{item.year}</span>}
+          {item.year&&item.genre&&<span className="npm-dot"/>}
+          {item.genre&&<span className="npm-g">{item.genre}</span>}
         </div>
         <div className="nc-panel-btns">
           <button className="npb npb-play" onClick={()=>onOpen(item,cat)}>▶ View</button>
           <button className="npb npb-more" onClick={()=>onOpen(item,cat)}>ℹ</button>
-          {isOwner && <>
+          {isOwner&&<>
             <button className="npb npb-edit" onClick={e=>{e.stopPropagation();onEdit(item,cat);}}>✏</button>
-            <button className="npb npb-del"  onClick={e=>{e.stopPropagation();if(window.confirm("Remove?")) onDelete(item.id,cat.id);}}>🗑</button>
+            <button className="npb npb-del" onClick={e=>{e.stopPropagation();if(window.confirm("Remove?")) onDelete(item.id,cat.id);}}>🗑</button>
           </>}
         </div>
       </div>
@@ -700,10 +607,10 @@ function NC({ item, cat, isOwner, onOpen, onEdit, onDelete }) {
 function NRow({ cat, items, isOwner, onOpen, onEdit, onDelete, onAdd }) {
   const ref = useRef(null);
   const [sort, setSort] = useState("default");
-  const scroll = d => ref.current?.scrollBy({ left: d * 420, behavior:"smooth" });
-  const sorted = [...items].sort((a, b) => {
-    if (sort === "rating") { const w={"★★★ Obsessed":3,"★★ Loved":2,"★ Liked":1}; return (w[b.rating]||0)-(w[a.rating]||0); }
-    if (sort === "year") return (parseInt(b.year)||0)-(parseInt(a.year)||0);
+  const scroll = d => ref.current?.scrollBy({left:d*420,behavior:"smooth"});
+  const sorted = [...items].sort((a,b)=>{
+    if(sort==="rating"){const w={"★★★ Obsessed":3,"★★ Loved":2,"★ Liked":1};return(w[b.rating]||0)-(w[a.rating]||0);}
+    if(sort==="year") return(parseInt(b.year)||0)-(parseInt(a.year)||0);
     return 0;
   });
   return (
@@ -711,30 +618,26 @@ function NRow({ cat, items, isOwner, onOpen, onEdit, onDelete, onAdd }) {
       <div className="nrow-hdr">
         <div className="nrow-left"><div className="nrow-title">{cat.label}</div><span className="nrow-count">{items.length}</span></div>
         <div className="nrow-right">
-          {items.length > 1 && <>
+          {items.length>1&&<>
             <button className={`nrow-sort ${sort==="rating"?"on":""}`} onClick={()=>setSort(s=>s==="rating"?"default":"rating")}>Rating</button>
-            <button className={`nrow-sort ${sort==="year"?"on":""}`}   onClick={()=>setSort(s=>s==="year"?"default":"year")}>Year</button>
+            <button className={`nrow-sort ${sort==="year"?"on":""}`} onClick={()=>setSort(s=>s==="year"?"default":"year")}>Year</button>
           </>}
-          {isOwner && <button className="nrow-add-btn" onClick={onAdd}>+ Add →</button>}
+          {isOwner&&<button className="nrow-add-btn" onClick={onAdd}>+ Add →</button>}
         </div>
       </div>
-      {items.length === 0 && !isOwner ? <div className="nrow-empty">Nothing here yet.</div> : (
+      {items.length===0&&!isOwner?<div className="nrow-empty">Nothing here yet.</div>:(
         <div className="nrow-wrap">
           <button className="narr narr-l" onClick={()=>scroll(-1)}>‹</button>
           <div className="nrow-track" ref={ref}>
-            {sorted.map((item, idx) => (
+            {sorted.map((item,idx)=>(
               <div key={item.id} className="rcard-wrap">
                 <div className="rcard-num">{idx+1}</div>
-                <NC item={item} cat={cat} isOwner={isOwner}
-                  onOpen={onOpen} onEdit={(i,c)=>onEdit(i,c||cat)} onDelete={onDelete}/>
+                <NC item={item} cat={cat} isOwner={isOwner} onOpen={onOpen} onEdit={(i,c)=>onEdit(i,c||cat)} onDelete={onDelete}/>
               </div>
             ))}
-            {isOwner && (
-              <div className={`nc-add ${SHAPE[cat.id]||"tall"}`} onClick={onAdd} style={{marginLeft: sorted.length ? 10 : 0}}>
-                <div className="nc-add-plus">+</div>
-                <div className="nc-add-lbl">Add</div>
-              </div>
-            )}
+            {isOwner&&<div className={`nc-add ${SHAPE[cat.id]||"tall"}`} onClick={onAdd} style={{marginLeft:sorted.length?10:0}}>
+              <div className="nc-add-plus">+</div><div className="nc-add-lbl">Add</div>
+            </div>}
           </div>
           <button className="narr narr-r" onClick={()=>scroll(1)}>›</button>
         </div>
@@ -744,41 +647,30 @@ function NRow({ cat, items, isOwner, onOpen, onEdit, onDelete, onAdd }) {
 }
 
 function Spotlight({ tops, isOwner, onOpen, onAdd, onSpotChange }) {
-  const [idx,  setIdx]  = useState(0);
+  const [idx, setIdx]   = useState(0);
   const [aKey, setAKey] = useState(0);
   const timer = useRef(null);
-
-  const goTo = useCallback(i => {
-    clearTimeout(timer.current);
-    setIdx(i); setAKey(k => k + 1);
-  }, []);
-
+  const goTo  = useCallback(i => { clearTimeout(timer.current); setIdx(i); setAKey(k=>k+1); }, []);
   useEffect(() => {
     if (!tops.length) return;
     onSpotChange?.(tops[idx]);
-    timer.current = setTimeout(() => {
-      const n = (idx + 1) % tops.length;
-      setIdx(n); setAKey(k => k + 1);
-    }, 6000);
+    timer.current = setTimeout(() => { const n=(idx+1)%tops.length; setIdx(n); setAKey(k=>k+1); }, 6000);
     return () => clearTimeout(timer.current);
   }, [idx, tops.length]);
-
   useEffect(() => { if (tops[idx]) onSpotChange?.(tops[idx]); }, [idx]);
-
   if (!tops.length) return (
     <div className="spot-empty">
       <div style={{fontSize:72,opacity:.1}}>🌌</div>
       <div className="spot-empty-h">Your Vault Awaits</div>
-      <div className="spot-empty-s">{isOwner ? "Tap the dot 5× to unlock, then start adding." : "Nothing saved yet."}</div>
+      <div className="spot-empty-s">{isOwner?"Tap the dot 5× to unlock.":"Nothing saved yet."}</div>
     </div>
   );
-
   const { item, cat } = tops[idx];
   return (
     <div className="spot">
-      {/* The cover image IS the hero background — sharp, cinematic */}
-      <div className="spot-cover-bg" key={`bg${idx}`}
-        style={{ backgroundImage: item.image ? `url(${item.image})` : "none" }}/>
+      {/* Cover image = the actual hero background, cinematic */}
+      <div className="spot-cover-bg" key={`cb${idx}`}
+        style={{backgroundImage:item.image?`url(${item.image})`:"none"}}/>
       <div className="spot-grad"/>
       <div className="spot-body" key={aKey}>
         <div className="spot-left">
@@ -788,22 +680,22 @@ function Spotlight({ tops, isOwner, onOpen, onAdd, onSpotChange }) {
           </div>
           <div className="spot-title">{item.name}</div>
           <div className="spot-meta">
-            {item.year   && <><span className="spot-year">{item.year}</span><span className="spot-sep"/></>}
-            {item.genre  && <><span className="spot-genre">{item.genre}</span><span className="spot-sep"/></>}
-            {item.rating && <span className="spot-rating-badge">{item.rating}</span>}
+            {item.year&&<><span className="spot-year">{item.year}</span><span className="spot-sep"/></>}
+            {item.genre&&<><span className="spot-genre">{item.genre}</span><span className="spot-sep"/></>}
+            {item.rating&&<span className="spot-rb">{item.rating}</span>}
           </div>
-          {item.tagline && <div className="spot-tagline">"{item.tagline}"</div>}
-          {item.desc    && <div className="spot-desc">{item.desc.slice(0,160)}{item.desc.length>160?"…":""}</div>}
+          {item.tagline&&<div className="spot-tagline">"{item.tagline}"</div>}
+          {item.desc&&<div className="spot-desc">{item.desc.slice(0,160)}{item.desc.length>160?"…":""}</div>}
           <div className="spot-btns">
             <button className="sp-btn-w" onClick={()=>onOpen(item,cat)}>▶ View Details</button>
-            {item.link && <a className="sp-btn-g" href={item.link} target="_blank" rel="noopener noreferrer">↗ Open Link</a>}
-            {isOwner && <button className="sp-btn-g" onClick={onAdd}>+ Add New</button>}
+            {item.link&&<a className="sp-btn-g" href={item.link} target="_blank" rel="noreferrer">↗ Open Link</a>}
+            {isOwner&&<button className="sp-btn-g" onClick={onAdd}>+ Add New</button>}
           </div>
         </div>
         <div className="spot-right">
           <div className="spot-poster" key={`p${idx}`}>
             <span style={{position:"relative",zIndex:0}}>{cat.icon}</span>
-            {item.image && <img src={item.image} alt=""
+            {item.image&&<img src={item.image} alt=""
               style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",zIndex:1}}
               onError={e=>e.target.style.display="none"}/>}
           </div>
@@ -811,11 +703,9 @@ function Spotlight({ tops, isOwner, onOpen, onAdd, onSpotChange }) {
       </div>
       <div className="spot-bottom">
         <div className="spot-dots">
-          {tops.map((_,i) => (
-            <div key={i} className={`sdot ${i===idx?"act":"sm"}`} onClick={()=>goTo(i)}>
-              {i===idx && <div className="sdot-fill" key={aKey}/>}
-            </div>
-          ))}
+          {tops.map((_,i)=><div key={i} className={`sdot ${i===idx?"act":"sm"}`} onClick={()=>goTo(i)}>
+            {i===idx&&<div className="sdot-fill" key={aKey}/>}
+          </div>)}
         </div>
         <div className="spot-navs">
           <button className="spot-nav" onClick={()=>goTo((idx-1+tops.length)%tops.length)}>‹</button>
@@ -827,189 +717,136 @@ function Spotlight({ tops, isOwner, onOpen, onAdd, onSpotChange }) {
 }
 
 function SearchBar({ allItems }) {
-  const [q, setQ] = useState(""); const [open, setOpen] = useState(false); const [detail, setDetail] = useState(null);
-  const ref = useRef(null);
-  useEffect(() => {
-    const fn = e => { if (!ref.current?.contains(e.target)) setOpen(false); };
-    document.addEventListener("mousedown", fn);
-    return () => document.removeEventListener("mousedown", fn);
-  }, []);
-  const results = q.trim().length < 2 ? [] : allItems
-    .filter(({ item }) => item.name.toLowerCase().includes(q.toLowerCase()) || (item.genre||"").toLowerCase().includes(q.toLowerCase()))
-    .slice(0, 8);
-  return (
+  const [q,setQ]=useState(""); const [open,setOpen]=useState(false); const [det,setDet]=useState(null);
+  const ref=useRef(null);
+  useEffect(()=>{const fn=e=>{if(!ref.current?.contains(e.target))setOpen(false);}; document.addEventListener("mousedown",fn); return()=>document.removeEventListener("mousedown",fn);},[]);
+  const results=q.trim().length<2?[]:allItems.filter(({item})=>item.name.toLowerCase().includes(q.toLowerCase())||(item.genre||"").toLowerCase().includes(q.toLowerCase())).slice(0,8);
+  return(
     <div className="nav-search" ref={ref}>
       <span className="nav-search-icon">🔍</span>
-      <input className="nav-search-input" value={q}
-        onChange={e=>{setQ(e.target.value);setOpen(true);}} onFocus={()=>setOpen(true)}
-        placeholder="Search vault…"/>
-      {q && <button className="nav-search-clear" onClick={()=>{setQ("");setOpen(false);}}>×</button>}
-      {open && q.trim().length >= 2 && (
+      <input className="nav-search-input" value={q} onChange={e=>{setQ(e.target.value);setOpen(true);}} onFocus={()=>setOpen(true)} placeholder="Search vault…"/>
+      {q&&<button className="nav-search-clear" onClick={()=>{setQ("");setOpen(false);}}>×</button>}
+      {open&&q.trim().length>=2&&(
         <div className="search-drop">
-          {results.length === 0
-            ? <div className="search-empty">No results for "{q}"</div>
-            : results.map(({ item, cat }) => (
-              <div key={item.id} className="search-item" onClick={()=>{setDetail({item,cat});setOpen(false);setQ("");}}>
-                <div className="search-thumb">
-                  <span>{cat.icon}</span>
-                  {item.image && <img src={item.image} alt="" onError={e=>e.target.style.display="none"}/>}
-                </div>
-                <div className="search-info">
-                  <div className="search-name">{item.name}</div>
-                  <div className="search-meta">
-                    <div className="search-dot" style={{background:cat.color}}/>
-                    <span style={{color:cat.color,fontSize:10,fontWeight:700}}>{cat.label}</span>
-                    {item.year && <span>{item.year}</span>}
-                    {item.rating && <span>{item.rating.split(" ")[0]}</span>}
-                  </div>
-                </div>
+          {results.length===0?<div className="search-empty">No results for "{q}"</div>:results.map(({item,cat})=>(
+            <div key={item.id} className="search-item" onClick={()=>{setDet({item,cat});setOpen(false);setQ("");}}>
+              <div className="search-thumb"><span>{cat.icon}</span>{item.image&&<img src={item.image} alt="" onError={e=>e.target.style.display="none"}/>}</div>
+              <div className="search-info">
+                <div className="search-name">{item.name}</div>
+                <div className="search-meta"><div className="sdot2" style={{background:cat.color}}/><span style={{color:cat.color,fontSize:10,fontWeight:700}}>{cat.label}</span>{item.year&&<span>{item.year}</span>}{item.rating&&<span>{item.rating.split(" ")[0]}</span>}</div>
               </div>
-            ))
-          }
+            </div>
+          ))}
         </div>
       )}
-      {detail && <Detail item={detail.item} cat={detail.cat} isOwner={false} onClose={()=>setDetail(null)} onEdit={()=>{}} onDelete={()=>{}}/>}
+      {det&&<Detail item={det.item} cat={det.cat} isOwner={false} onClose={()=>setDet(null)} onEdit={()=>{}} onDelete={()=>{}}/>}
     </div>
   );
 }
 
-/* ══════════════════════════ APP ══════════════════════════ */
+/* ══════════════════ APP ══════════════════ */
 export default function App() {
-  const [data,     setData]     = useState(() => dbGet());
-  const [isOwner,  setIsOwner]  = useState(false);
-  const [showLock, setShowLock] = useState(false);
-  const [showAdd,  setShowAdd]  = useState(false);
-  const [addCat,   setAddCat]   = useState(null);
-  const [editItem, setEditItem] = useState(null);
-  const [detail,   setDetail]   = useState(null);
-  const [toast,    setToast]    = useState(null);
-  const [scrolled, setScrolled] = useState(false);
-  const [dotTap,   setDotTap]   = useState(false);
-  const [spotTop,  setSpotTop]  = useState(null); // current spotlight item for bg
-  const tapCount   = useRef(0);
-  const tapTimer   = useRef(null);
-  const toastTimer = useRef(null);
+  const [data,    setData]    = useState(()=>dbGet());
+  /* Owner state — auto-restores from localStorage on page load */
+  const [isOwner, setIsOwner] = useState(()=>isDeviceOwner());
+  const [showLock,setShowLock]= useState(false);
+  const [showAdd, setShowAdd] = useState(false);
+  const [addCat,  setAddCat]  = useState(null);
+  const [editItem,setEditItem]= useState(null);
+  const [detail,  setDetail]  = useState(null);
+  const [toast,   setToast]   = useState(null);
+  const [scrolled,setScrolled]= useState(false);
+  const [dotTap,  setDotTap]  = useState(false);
+  const [spotTop, setSpotTop] = useState(null);
+  const tapCount=useRef(0); const tapTimer=useRef(null); const toastTimer=useRef(null);
 
   /* Favicon + title */
-  useEffect(() => {
-    document.querySelectorAll("link[rel*='icon']").forEach(el => el.remove());
-    const lnk = document.createElement("link");
-    lnk.rel  = "icon"; lnk.type = "image/png";
-    lnk.href = `data:image/png;base64,${FAVICON_B64}`;
+  useEffect(()=>{
+    document.querySelectorAll("link[rel*='icon']").forEach(el=>el.remove());
+    const lnk=document.createElement("link");
+    lnk.rel="icon"; lnk.type="image/png";
+    lnk.href=`data:image/png;base64,${FAVICON_B64}`;
     document.head.appendChild(lnk);
-    document.title = "Shubham.World";
-  }, []);
+    document.title="Shubham.World";
+  },[]);
 
-  useEffect(() => { dbSet(data); }, [data]);
-  useEffect(() => {
-    const fn = () => setScrolled(window.scrollY > 60);
-    window.addEventListener("scroll", fn);
-    return () => window.removeEventListener("scroll", fn);
-  }, []);
+  useEffect(()=>{dbSet(data);},[data]);
+  useEffect(()=>{const fn=()=>setScrolled(window.scrollY>60); window.addEventListener("scroll",fn); return()=>window.removeEventListener("scroll",fn);},[]);
 
-  const showT = (m, e = "✅") => {
-    setToast({ msg:m, emoji:e });
-    clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(() => setToast(null), 2600);
-  };
+  const showT=(m,e="✅")=>{setToast({msg:m,emoji:e}); clearTimeout(toastTimer.current); toastTimer.current=setTimeout(()=>setToast(null),2600);};
 
-  const handleDot = () => {
-    tapCount.current += 1; setDotTap(true); setTimeout(() => setDotTap(false), 160);
+  /* 5 rapid taps to open lock modal */
+  const handleDot=()=>{
+    tapCount.current+=1; setDotTap(true); setTimeout(()=>setDotTap(false),160);
     clearTimeout(tapTimer.current);
-    if (tapCount.current >= 5) {
-      tapCount.current = 0;
-      if (isOwner) { setIsOwner(false); showT("Vault locked","🔒"); }
+    if(tapCount.current>=5){
+      tapCount.current=0;
+      if(isOwner){ setIsOwner(false); setDeviceOwner(false); showT("Vault locked","🔒"); }
       else setShowLock(true);
       return;
     }
-    tapTimer.current = setTimeout(() => { tapCount.current = 0; }, 1800);
+    tapTimer.current=setTimeout(()=>{tapCount.current=0;},1800);
   };
 
-  const items   = id => data[id] || [];
-  const allItems = CATS.flatMap(cat => items(cat.id).map(item => ({ item, cat })));
+  const items    = id => data[id]||[];
+  const allItems = CATS.flatMap(cat=>items(cat.id).map(item=>({item,cat})));
   const total    = allItems.length;
-  const linked   = allItems.filter(({ item }) => item.link).length;
-  const obsessed = allItems.filter(({ item }) => item.rating === "★★★ Obsessed").length;
-  const tops     = allItems
-    .map(({ item, cat }) => ({ item, cat, sc: score(item, items(cat.id).indexOf(item)) }))
-    .sort((a, b) => b.sc - a.sc).slice(0, 5);
+  const linked   = allItems.filter(({item})=>item.link).length;
+  const obsessed = allItems.filter(({item})=>item.rating==="★★★ Obsessed").length;
+  const tops     = allItems.map(({item,cat})=>({item,cat,sc:score(item,items(cat.id).indexOf(item))})).sort((a,b)=>b.sc-a.sc).slice(0,5);
 
-  const openAdd  = cat         => { setAddCat(cat); setEditItem(null); setShowAdd(true); };
-  const openEdit = (item, cat) => { setAddCat(cat); setEditItem(item); setShowAdd(true); };
-  const openDet  = (item, cat) => setDetail({ item, cat });
+  const openAdd  = cat         => {setAddCat(cat);setEditItem(null);setShowAdd(true);};
+  const openEdit = (item,cat)  => {setAddCat(cat);setEditItem(item);setShowAdd(true);};
+  const openDet  = (item,cat)  => setDetail({item,cat});
 
-  const handleSave = vals => {
-    if (editItem) {
-      setData(d => ({ ...d, [addCat.id]: (d[addCat.id]||[]).map(i => i.id===editItem.id ? {...i,...vals} : i) }));
-      showT(`"${vals.name}" updated!`, "💾");
-    } else {
-      setData(d => ({ ...d, [addCat.id]: [...(d[addCat.id]||[]), {...vals, id:Date.now().toString()}] }));
-      showT(`"${vals.name}" added!`, addCat.icon);
-    }
+  const handleSave=vals=>{
+    if(editItem){setData(d=>({...d,[addCat.id]:(d[addCat.id]||[]).map(i=>i.id===editItem.id?{...i,...vals}:i)})); showT(`"${vals.name}" updated!`,"💾");}
+    else{setData(d=>({...d,[addCat.id]:[...(d[addCat.id]||[]),{...vals,id:Date.now().toString()}]})); showT(`"${vals.name}" added!`,addCat.icon);}
     setShowAdd(false); setEditItem(null);
   };
 
-  const handleDelete = (id, catId) => {
-    const cid = catId || CATS.find(c => items(c.id).some(i => i.id===id))?.id;
-    if (!cid) return;
-    setData(d => ({ ...d, [cid]: (d[cid]||[]).filter(i => i.id!==id) }));
-    setDetail(null); showT("Removed", "🗑");
+  const handleDelete=(id,catId)=>{
+    const cid=catId||CATS.find(c=>items(c.id).some(i=>i.id===id))?.id;
+    if(!cid) return;
+    setData(d=>({...d,[cid]:(d[cid]||[]).filter(i=>i.id!==id)}));
+    setDetail(null); showT("Removed","🗑");
   };
 
-  /* Ambient background — blurred cover image of current spotlight item */
+  /* Ambient BG — blurred cover of current spotlight item */
   const bgUrl = spotTop?.item?.image || tops[0]?.item?.image || null;
-  /* Category-colour radial glows */
-  const glows = tops.slice(0, 5).map((t, i) => {
-    const sizes = ["45vw 40vh","38vw 36vh","30vw 28vh","28vw 25vh","25vw 22vh"];
-    const positions = [
-      { top:"-10%", left:"-5%"  },
-      { top:"-8%",  right:"-5%" },
-      { top:"25%",  left:"40%"  },
-      { bottom:"0", right:"5%"  },
-      { bottom:"0", left:"5%"   },
-    ];
-    return { color: t.cat.color, size: sizes[i], pos: positions[i] };
+  const glows = tops.slice(0,5).map((t,i)=>{
+    const px=[{top:"-10%",left:"-5%"},{top:"-8%",right:"-5%"},{top:"25%",left:"40%"},{bottom:"0",right:"5%"},{bottom:"0",left:"5%"}];
+    return {color:t.cat.color,pos:px[i]};
   });
 
   return (
     <>
       <style>{CSS}</style>
-
-      {/* ── Ambient BG ── */}
+      {/* Ambient background */}
       <div className="bg-root">
-        {bgUrl && <div className="bg-img" style={{ backgroundImage:`url(${bgUrl})` }}/>}
+        {bgUrl&&<div className="bg-img" style={{backgroundImage:`url(${bgUrl})`}}/>}
         <div className="bg-glows">
-          {glows.map((g, i) => (
-            <div key={i} className="bg-glow" style={{
-              background: g.color,
-              width: g.size.split(" ")[0], height: g.size.split(" ")[1],
-              ...g.pos,
-            }}/>
-          ))}
+          {glows.map((g,i)=><div key={i} className="bg-glow" style={{background:g.color,width:"45vw",height:"40vh",...g.pos}}/>)}
         </div>
         <div className="bg-darken"/>
       </div>
 
-      {/* ── Nav ── */}
-      <nav className={`nav ${scrolled ? "stuck" : ""}`}>
+      {/* Nav */}
+      <nav className={`nav ${scrolled?"stuck":""}`}>
         <div className="logo">
           <div className={`logo-dot${dotTap?" tapped":""}${isOwner?" owner-on":""}`} onClick={handleDot}/>
           SHUBHAM.WORLD
         </div>
         <div className="nav-r">
           <SearchBar allItems={allItems}/>
-          {isOwner && <div className="owner-pill" onClick={()=>{setIsOwner(false);showT("Vault locked","🔒");}}>● OWNER</div>}
+          {isOwner&&<div className="owner-pill" onClick={()=>{setIsOwner(false);setDeviceOwner(false);showT("Vault locked","🔒");}}>● OWNER</div>}
           <div className="nav-avatar">S</div>
         </div>
       </nav>
 
-      {/* ── Spotlight ── */}
-      <Spotlight tops={tops} isOwner={isOwner} onOpen={openDet}
-        onAdd={() => openAdd(CATS[0])}
-        onSpotChange={t => setSpotTop(t)}/>
+      <Spotlight tops={tops} isOwner={isOwner} onOpen={openDet} onAdd={()=>openAdd(CATS[0])} onSpotChange={t=>setSpotTop(t)}/>
 
-      {/* ── Stats Bar ── */}
-      {total > 0 && (
+      {total>0&&(
         <div className="stats-bar">
           <div className="stat-item"><span className="stat-num">{total}</span><span className="stat-lbl">Favourites</span></div>
           <div className="stat-div"/>
@@ -1021,32 +858,24 @@ export default function App() {
         </div>
       )}
 
-      {/* ── Rows ── */}
       <div className="content">
-        {CATS.map(cat => (
-          <NRow key={cat.id} cat={cat} items={items(cat.id)} isOwner={isOwner}
-            onOpen={openDet} onEdit={openEdit} onDelete={handleDelete}
-            onAdd={() => openAdd(cat)}/>
-        ))}
-        <div className="site-footer">
-          {total} favourites · {linked} links<br/>
-          <span style={{opacity:.4}}>Made with 🖤 by Shubham</span>
-        </div>
+        {CATS.map(cat=><NRow key={cat.id} cat={cat} items={items(cat.id)} isOwner={isOwner} onOpen={openDet} onEdit={openEdit} onDelete={handleDelete} onAdd={()=>openAdd(cat)}/>)}
+        <div className="site-footer">{total} favourites · {linked} links<br/><span style={{opacity:.4}}>Made with 🖤 by Shubham</span></div>
       </div>
 
-      {detail && <Detail item={detail.item} cat={detail.cat} isOwner={isOwner}
-        onClose={() => setDetail(null)}
-        onEdit={item => { setDetail(null); openEdit(item, detail.cat); }}
+      {detail&&<Detail item={detail.item} cat={detail.cat} isOwner={isOwner}
+        onClose={()=>setDetail(null)}
+        onEdit={item=>{setDetail(null);openEdit(item,detail.cat);}}
         onDelete={handleDelete}/>}
 
-      {showLock && <LockModal onClose={() => setShowLock(false)}
-        onUnlock={() => { setIsOwner(true); showT("Swagat hai Shubham! 🎉","🔓"); }}/>}
+      {showLock&&<LockModal onClose={()=>setShowLock(false)}
+        onUnlock={()=>{setIsOwner(true);setDeviceOwner(true);showT("Swagat hai Shubham! 🎉","🔓");}}/>}
 
-      {showAdd && addCat && isOwner && <EditModal cat={addCat} edit={editItem}
-        onClose={() => { setShowAdd(false); setEditItem(null); }}
+      {showAdd&&addCat&&isOwner&&<EditModal cat={addCat} edit={editItem}
+        onClose={()=>{setShowAdd(false);setEditItem(null);}}
         onSave={handleSave}/>}
 
-      {toast && <Toast msg={toast.msg} emoji={toast.emoji}/>}
+      {toast&&<Toast msg={toast.msg} emoji={toast.emoji}/>}
     </>
   );
 }

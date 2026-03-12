@@ -212,6 +212,11 @@ html,body{background:var(--black);color:var(--t1);font-family:'DM Sans',sans-ser
 .nc-add-plus{font-size:28px;line-height:1;transition:transform .35s cubic-bezier(.34,1.56,.64,1);}
 .nc-add:hover .nc-add-plus{transform:rotate(90deg) scale(1.1);}
 .nc-add-lbl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;}
+.nc-private-badge{position:absolute;top:6px;left:6px;background:rgba(0,0,0,.85);border-radius:3px;padding:2px 6px;font-size:10px;z-index:2;line-height:1.4;}
+.nc.is-private .nc-img-box{opacity:.55;}
+.nc.is-private .nc-img-box::after{content:'';position:absolute;inset:0;border:2px solid rgba(255,200,0,.3);border-radius:6px;pointer-events:none;z-index:3;}
+.npb-priv{background:rgba(255,255,255,.08);color:var(--t2);width:28px;flex:none;font-size:12px;}.npb-priv:hover{background:rgba(255,200,0,.2);color:#F5C518;}
+.npb-priv.on{background:rgba(255,200,0,.15);color:#F5C518;}
 .det-bg{position:fixed;inset:0;z-index:950;background:rgba(0,0,0,.88);animation:fadeIn .18s ease;}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 .det-box{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:951;width:min(860px,95vw);max-height:90vh;background:var(--card);border:1px solid rgba(255,255,255,.1);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;animation:bPop .26s cubic-bezier(.34,1.56,.64,1);}
@@ -482,14 +487,15 @@ function Detail({ item, cat, isOwner, onClose, onEdit, onDelete }) {
   );
 }
 
-function NC({ item, cat, isOwner, onOpen, onEdit, onDelete }) {
+function NC({ item, cat, isOwner, onOpen, onEdit, onDelete, onTogglePrivate }) {
   const sh=SHAPE[cat.id]||"tall";
   return (
-    <div className={`nc ${sh}`}>
+    <div className={`nc ${sh}${item.private?" is-private":""}`}>
       <div className="nc-img-box">
         <div className="nc-ph">{cat.icon}</div>
         {item.image&&<img src={item.image} alt="" className="nc-real-img" onError={e=>e.target.style.display="none"}/>}
         {item.rating&&<div className="nc-star">{item.rating.split(" ")[0]}</div>}
+        {isOwner&&item.private&&<div className="nc-private-badge">🔒</div>}
       </div>
       <div className="nc-panel">
         <div className="nc-panel-title">{item.name}</div>
@@ -502,45 +508,57 @@ function NC({ item, cat, isOwner, onOpen, onEdit, onDelete }) {
           <button className="npb npb-play" onClick={()=>onOpen(item,cat)}>▶ View</button>
           <button className="npb npb-more" onClick={()=>onOpen(item,cat)}>ℹ</button>
           {isOwner&&<>
+            <button className={`npb npb-priv${item.private?" on":""}`}
+              title={item.private?"Make Public":"Make Private"}
+              onClick={e=>{e.stopPropagation();onTogglePrivate(item.id,cat.id);}}>
+              {item.private?"🔒":"🌐"}
+            </button>
             <button className="npb npb-edit" onClick={e=>{e.stopPropagation();onEdit(item,cat);}}>✏</button>
             <button className="npb npb-del" onClick={e=>{e.stopPropagation();if(window.confirm("Remove?")) onDelete(item.id,cat.id);}}>🗑</button>
           </>}
         </div>
       </div>
-      <div className="nc-label">{item.name}</div>
+      <div className="nc-label">{item.name}{item.private&&isOwner?" 🔒":""}</div>
     </div>
   );
 }
 
-function NRow({ cat, items, isOwner, onOpen, onEdit, onDelete, onAdd }) {
+function NRow({ cat, items, isOwner, onOpen, onEdit, onDelete, onAdd, onTogglePrivate }) {
   const ref=useRef(null);
   const [sort,setSort]=useState("default");
   const scroll=d=>ref.current?.scrollBy({left:d*420,behavior:"smooth"});
-  const sorted=[...items].sort((a,b)=>{
+  /* Filter out private items for non-owners */
+  const visible = isOwner ? items : items.filter(i=>!i.private);
+  const sorted=[...visible].sort((a,b)=>{
     if(sort==="rating"){const w={"★★★ Obsessed":3,"★★ Loved":2,"★ Liked":1};return(w[b.rating]||0)-(w[a.rating]||0);}
     if(sort==="year") return(parseInt(b.year)||0)-(parseInt(a.year)||0);
     return 0;
   });
+  if(sorted.length===0&&!isOwner) return null;
   return (
     <div className="nrow">
       <div className="nrow-hdr">
-        <div className="nrow-left"><div className="nrow-title">{cat.label}</div><span className="nrow-count">{items.length}</span></div>
+        <div className="nrow-left">
+          <div className="nrow-title">{cat.label}</div>
+          <span className="nrow-count">{sorted.length}{isOwner&&items.filter(i=>i.private).length>0&&<span style={{color:"var(--gold)",fontSize:10,marginLeft:4}}>({items.filter(i=>i.private).length}🔒)</span>}</span>
+        </div>
         <div className="nrow-right">
-          {items.length>1&&<>
+          {sorted.length>1&&<>
             <button className={`nrow-sort ${sort==="rating"?"on":""}`} onClick={()=>setSort(s=>s==="rating"?"default":"rating")}>Rating</button>
             <button className={`nrow-sort ${sort==="year"?"on":""}`} onClick={()=>setSort(s=>s==="year"?"default":"year")}>Year</button>
           </>}
           {isOwner&&<button className="nrow-add-btn" onClick={onAdd}>+ Add →</button>}
         </div>
       </div>
-      {items.length===0&&!isOwner?<div className="nrow-empty">Nothing here yet.</div>:(
+      {sorted.length===0&&isOwner&&<div className="nrow-empty">Nothing here yet.</div>}
+      {sorted.length>0&&(
         <div className="nrow-wrap">
           <button className="narr narr-l" onClick={()=>scroll(-1)}>‹</button>
           <div className="nrow-track" ref={ref}>
             {sorted.map((item,idx)=>(
               <div key={item.id} className="rcard-wrap">
                 <div className="rcard-num">{idx+1}</div>
-                <NC item={item} cat={cat} isOwner={isOwner} onOpen={onOpen} onEdit={(i,c)=>onEdit(i,c||cat)} onDelete={onDelete}/>
+                <NC item={item} cat={cat} isOwner={isOwner} onOpen={onOpen} onEdit={(i,c)=>onEdit(i,c||cat)} onDelete={onDelete} onTogglePrivate={onTogglePrivate}/>
               </div>
             ))}
             {isOwner&&<div className={`nc-add ${SHAPE[cat.id]||"tall"}`} onClick={onAdd} style={{marginLeft:sorted.length?10:0}}>
@@ -704,7 +722,7 @@ export default function App() {
   const total    = allItems.length;
   const linked   = allItems.filter(({item})=>item.link).length;
   const obsessed = allItems.filter(({item})=>item.rating==="★★★ Obsessed").length;
-  const tops     = allItems.map(({item,cat})=>({item,cat,sc:score(item,items(cat.id).indexOf(item))})).sort((a,b)=>b.sc-a.sc).slice(0,5);
+  const tops     = allItems.filter(({item})=>!item.private).map(({item,cat})=>({item,cat,sc:score(item,items(cat.id).indexOf(item))})).sort((a,b)=>b.sc-a.sc).slice(0,5);
 
   const openAdd  = cat        =>{setAddCat(cat);setEditItem(null);setShowAdd(true);};
   const openEdit = (item,cat) =>{setAddCat(cat);setEditItem(item);setShowAdd(true);};
@@ -726,6 +744,21 @@ export default function App() {
     if(!cid) return;
     setData(d=>({...d,[cid]:(d[cid]||[]).filter(i=>i.id!==id)}));
     setDetail(null); showT("Removed","🗑");
+  };
+
+  const handleTogglePrivate=(id,catId)=>{
+    const cid=catId||CATS.find(c=>items(c.id).some(i=>i.id===id))?.id;
+    if(!cid) return;
+    let isNowPrivate=false;
+    setData(d=>{
+      const updated=(d[cid]||[]).map(i=>{
+        if(i.id!==id) return i;
+        isNowPrivate=!i.private;
+        return{...i,private:!i.private};
+      });
+      return{...d,[cid]:updated};
+    });
+    setTimeout(()=>showT(isNowPrivate?"Hidden from public 🔒":"Now visible to everyone 🌐",""),50);
   };
 
   const bgUrl = spotTop?.item?.image||tops[0]?.item?.image||null;
@@ -788,7 +821,7 @@ export default function App() {
       )}
 
       <div className="content">
-        {CATS.map(cat=><NRow key={cat.id} cat={cat} items={items(cat.id)} isOwner={isOwner} onOpen={openDet} onEdit={openEdit} onDelete={handleDelete} onAdd={()=>openAdd(cat)}/>)}
+        {CATS.map(cat=><NRow key={cat.id} cat={cat} items={items(cat.id)} isOwner={isOwner} onOpen={openDet} onEdit={openEdit} onDelete={handleDelete} onAdd={()=>openAdd(cat)} onTogglePrivate={handleTogglePrivate}/>)}
         <div className="site-footer">{total} favourites · {linked} links<br/><span style={{opacity:.4}}>Made with 🖤 by Shubham</span></div>
       </div>
 

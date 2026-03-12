@@ -14,7 +14,13 @@ exports.handler = async (event) => {
     };
   }
 
-  const bodyStr = event.body || "{}";
+  // Force the correct model — override whatever the frontend sends
+  let body = {};
+  try { body = JSON.parse(event.body || "{}"); } catch {}
+  body.model = "claude-3-haiku-20240307";
+  body.max_tokens = body.max_tokens || 900;
+
+  const bodyStr = JSON.stringify(body);
 
   return new Promise((resolve) => {
     const req = https.request(

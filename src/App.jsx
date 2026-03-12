@@ -490,7 +490,7 @@ function Detail({ item, cat, isOwner, onClose, onEdit, onDelete }) {
 function NC({ item, cat, isOwner, onOpen, onEdit, onDelete, onTogglePrivate }) {
   const sh=SHAPE[cat.id]||"tall";
   return (
-    <div className={`nc ${sh}${item.private?" is-private":""}`}>
+    <div className={`nc ${sh}${item.private?" is-private":""}`} onClick={()=>onOpen(item,cat)}>
       <div className="nc-img-box">
         <div className="nc-ph">{cat.icon}</div>
         {item.image&&<img src={item.image} alt="" className="nc-real-img" onError={e=>e.target.style.display="none"}/>}
@@ -505,8 +505,8 @@ function NC({ item, cat, isOwner, onOpen, onEdit, onDelete, onTogglePrivate }) {
           {item.genre&&<span className="npm-g">{item.genre}</span>}
         </div>
         <div className="nc-panel-btns">
-          <button className="npb npb-play" onClick={()=>onOpen(item,cat)}>▶ View</button>
-          <button className="npb npb-more" onClick={()=>onOpen(item,cat)}>ℹ</button>
+          <button className="npb npb-play" onClick={e=>{e.stopPropagation();onOpen(item,cat);}}>▶ View</button>
+          <button className="npb npb-more" onClick={e=>{e.stopPropagation();onOpen(item,cat);}}>ℹ</button>
           {isOwner&&<>
             <button className={`npb npb-priv${item.private?" on":""}`}
               title={item.private?"Make Public":"Make Private"}

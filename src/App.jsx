@@ -60,6 +60,7 @@ const aiFill = async (name, catLabel, onStatus) => {
 };
 
 const aiSuggest = async (allItems) => {
+  if(allItems.length===0) throw new Error("Add some items to your vault first!");
   const summary=CATS.map(cat=>{const its=allItems.filter(({cat:c})=>c.id===cat.id).map(({item})=>item.name).slice(0,5);return its.length?`${cat.label}: ${its.join(", ")}`:null;}).filter(Boolean).join("\n");
   const res=await fetch("/.netlify/functions/claude",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
     model:"claude-3-haiku-20240307",max_tokens:600,
@@ -93,8 +94,10 @@ const buildCSS = (themeId) => {
   return `${GFONTS}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{--bg:${t.bg};--card:${t.card};--hover:${t.hover};--line:${t.line};--accent:${t.accent};--black:#000;--t1:#fff;--t2:#B3B3B3;--t3:#6A6A6A;--gold:#F5C518;--red:#E50914;}
-html,body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;overflow-x:hidden;}
+html,body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
 ::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px;}
+*:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px;}
+button,a{-webkit-tap-highlight-color:transparent;}
 .bg-root{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
 .bg-img{position:absolute;inset:-10%;background-size:cover;background-position:center;filter:blur(100px) brightness(.17) saturate(2.5);transform:scale(1.2);transition:background-image 1.5s;}
 .bg-glows{position:absolute;inset:0;}.bg-glow{position:absolute;border-radius:50%;filter:blur(90px);opacity:.13;}
@@ -168,7 +171,8 @@ html,body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;
 .stat-num{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.04em;color:var(--accent);}
 .stat-lbl{font-size:11px;color:var(--t3);font-weight:600;letter-spacing:.06em;text-transform:uppercase;}
 .stat-div{width:1px;height:28px;background:var(--line);flex-shrink:0;}
-.view-tabs{display:flex;gap:6px;padding:20px 28px 0;position:relative;z-index:2;}
+.view-tabs{display:flex;gap:6px;padding:20px 28px 0;position:relative;z-index:2;flex-wrap:wrap;}
+.view-tabs.top-pad{padding-top:80px;}
 .vtab{padding:7px 16px;border-radius:100px;border:1px solid var(--line);background:transparent;color:var(--t3);font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;letter-spacing:.04em;}
 .vtab:hover{color:#fff;border-color:rgba(255,255,255,.25);}
 .vtab.on{background:var(--accent);color:#000;border-color:var(--accent);}
@@ -186,6 +190,10 @@ html,body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;
 .nrow-wrap{position:relative;}
 .nrow-track{display:flex;gap:0;padding:4px 28px 32px;overflow-x:auto;overflow-y:visible;scroll-behavior:smooth;scrollbar-width:none;align-items:flex-end;}
 .nrow-track::-webkit-scrollbar{display:none;}
+.nrow-wrap::before,.nrow-wrap::after{content:'';position:absolute;top:0;bottom:32px;width:60px;z-index:4;pointer-events:none;opacity:0;transition:opacity .3s;}
+.nrow-wrap::before{left:0;background:linear-gradient(to right,rgba(0,0,0,.9),transparent);}
+.nrow-wrap::after{right:0;background:linear-gradient(to left,rgba(0,0,0,.9),transparent);}
+.nrow-wrap:hover::before,.nrow-wrap:hover::after{opacity:1;}
 .narr{position:absolute;top:50%;transform:translateY(-65%);width:36px;height:72px;border-radius:4px;z-index:5;background:rgba(6,6,6,.95);border:1px solid rgba(255,255,255,.12);color:#fff;font-size:22px;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:all .2s;cursor:pointer;}
 .nrow-wrap:hover .narr{opacity:1;pointer-events:all;}.narr:hover{background:rgba(40,40,40,.98);}
 .narr-l{left:0;}.narr-r{right:0;}
@@ -196,8 +204,9 @@ html,body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;
 .rcard-wrap:nth-child(2) .rcard-num{-webkit-text-stroke:2.5px rgba(195,195,195,.47);}
 .rcard-wrap:nth-child(3) .rcard-num{-webkit-text-stroke:2.5px rgba(175,175,175,.42);}
 .rcard-wrap .nc{z-index:1;}
-.nc{flex-shrink:0;position:relative;cursor:pointer;border-radius:6px;transition:transform .28s cubic-bezier(.22,.61,.36,1),z-index 0s .28s;z-index:1;}
+.nc{flex-shrink:0;position:relative;cursor:pointer;border-radius:6px;transition:transform .28s cubic-bezier(.22,.61,.36,1),z-index 0s .28s;z-index:1;-webkit-tap-highlight-color:transparent;}
 .nc:hover{transform:scale(1.18);z-index:60;transition:transform .28s cubic-bezier(.22,.61,.36,1),z-index 0s 0s;}
+@media(hover:none){.nc:hover{transform:none;}.nc:active{transform:scale(.96);}}
 .nc.tall{width:130px;}.nc.sq{width:155px;}.nc.wide{width:230px;}
 .nc-img-box{width:100%;border-radius:6px;overflow:hidden;position:relative;box-shadow:0 4px 18px rgba(0,0,0,.6);transition:box-shadow .28s,border-radius .28s;}
 .nc:hover .nc-img-box{box-shadow:0 18px 50px rgba(0,0,0,.9);border-radius:6px 6px 0 0;}
@@ -259,7 +268,7 @@ html,body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;
 .det-actions{position:absolute;top:12px;right:12px;display:flex;gap:8px;z-index:4;}
 .det-x{width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.15);color:#fff;font-size:15px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;}
 .det-x:hover{background:rgba(229,9,20,.5);}
-.det-body{padding:18px 32px 24px 190px;overflow-y:auto;flex:1;}
+.det-body{padding:18px 32px 24px 190px;overflow-y:auto;flex:1;min-height:0;}
 .det-cat-lbl{display:inline-block;padding:3px 12px;border-radius:100px;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#000;margin-bottom:10px;}
 .det-name{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,5vw,52px);letter-spacing:.02em;line-height:.92;margin-bottom:12px;}
 .det-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
@@ -393,7 +402,7 @@ html,body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;
 .site-footer{text-align:center;padding:40px 0 20px;color:var(--t3);font-size:12px;line-height:1.9;}
 @media(max-width:900px){
   .spot-right{display:none;}.spot-body{padding:70px 22px 60px;}.spot-bottom{padding:0 22px 28px;}
-  .nav{padding:0 16px;}.det-body{padding:14px 18px 18px;}.det-poster{display:none;}.det-footer{padding:12px 18px;}
+  .nav{padding:0 16px;}.det-body{padding:14px 18px 18px 18px !important;}.det-poster{display:none;}.det-footer{padding:12px 18px;}
   .modal-box{padding:22px;}.two{grid-template-columns:1fr;}.stats-bar{padding:12px 16px;gap:20px;}
   .rcard-num{font-size:80px;letter-spacing:-2px;}.moodboard{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));}
   .wrapped-grid{grid-template-columns:repeat(2,1fr);}
@@ -401,15 +410,78 @@ html,body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;
 @media(max-width:500px){
   .spot-title{font-size:44px;}.nav-search{display:none;}.rcard-num{font-size:64px;margin-right:-14px;}
   .nrow-hdr,.nrow-track,.nrow-empty{padding-left:14px;padding-right:14px;}
-}`;
+}
+.scroll-top{position:fixed;bottom:30px;left:30px;z-index:800;width:42px;height:42px;border-radius:50%;background:var(--hover);border:1px solid var(--line);color:var(--t2);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .25s;opacity:0;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.6);}
+.scroll-top.show{opacity:1;pointer-events:all;}.scroll-top:hover{background:var(--accent);color:#000;border-color:var(--accent);}
+.mb-filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
+.mb-filter{padding:6px 14px;border-radius:100px;border:1px solid var(--line);background:transparent;color:var(--t3);font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;}
+.mb-filter:hover{color:#fff;border-color:rgba(255,255,255,.25);}
+.mb-filter.on{border-color:var(--accent);color:var(--accent);background:rgba(29,185,84,.07);}
+.badges-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+.badge{display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:100px;background:var(--hover);border:1px solid var(--line);}
+.badge.earned{border-color:var(--gold);background:rgba(245,197,24,.07);}
+.badge-icon{font-size:18px;}.badge-info{}.badge-name{font-size:12px;font-weight:700;color:var(--t1);}
+.badge.earned .badge-name{color:var(--gold);}
+.badge-desc{font-size:10px;color:var(--t3);margin-top:1px;}
+.badge.locked{opacity:.4;}
+.kb-hint{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:800;background:rgba(0,0,0,.8);border:1px solid var(--line);border-radius:100px;padding:8px 18px;font-size:11px;color:var(--t3);display:flex;gap:14px;pointer-events:none;animation:tpop .3s both;}
+.kb-key{background:var(--hover);border:1px solid var(--line);border-radius:4px;padding:1px 7px;font-size:10px;font-weight:700;color:var(--t2);}
+.sugg-add-btn{margin-top:12px;padding:8px 16px;border-radius:100px;border:none;background:var(--accent);color:#000;font-size:11px;font-weight:800;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;width:100%;}
+.sugg-add-btn:hover{filter:brightness(1.1);}
+.sugg-add-btn.added{background:rgba(255,255,255,.08);color:var(--t3);cursor:default;filter:none;}
+.det-added{font-size:11px;color:var(--t3);margin-left:auto;}
+.share-btn{padding:9px 18px;border-radius:100px;border:1px solid var(--line);background:transparent;color:var(--t2);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .2s;}
+.share-btn:hover{border-color:var(--accent);color:var(--accent);}
+.share-btn.copied{border-color:var(--accent);color:var(--accent);background:rgba(29,185,84,.08);}
+.podium{display:flex;align-items:flex-end;justify-content:center;gap:14px;margin-bottom:28px;}
+.pod-card{text-align:center;cursor:pointer;transition:transform .2s;}.pod-card:hover{transform:translateY(-4px);}
+.pod-img{border-radius:10px;overflow:hidden;background:var(--hover);position:relative;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;}
+.pod-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.pod-rank{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:.08em;}
+.pod-name{font-size:12px;font-weight:700;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pod-cat{font-size:10px;color:var(--t3);}
+.nrow-cat-icon{font-size:18px;margin-right:4px;}
+`;
 };
 
 /* ═══════════════════ SMALL COMPONENTS ═══════════════════ */
+
+/* ── Badges ── */
+const BADGES = [
+  { id:"first",    icon:"🌱", name:"First Favourite",   desc:"Add your first item",         check:(all)=>all.length>=1 },
+  { id:"ten",      icon:"🔥", name:"Getting Hooked",     desc:"Add 10 favourites",            check:(all)=>all.length>=10 },
+  { id:"fifty",    icon:"💫", name:"Vault Keeper",       desc:"Add 50 favourites",            check:(all)=>all.length>=50 },
+  { id:"obsessed", icon:"👑", name:"Obsessed Much",      desc:"Rate 5 items Obsessed",        check:(all)=>all.filter(({item})=>item.rating==="★★★ Obsessed").length>=5 },
+  { id:"rewatch",  icon:"▶",  name:"Binge Mode",         desc:"Log 10 rewatches total",       check:(all)=>all.reduce((s,{item})=>s+(item.rewatchCount||0),0)>=10 },
+  { id:"linker",   icon:"🔗", name:"Link Collector",     desc:"Save 10 links",                check:(all)=>all.filter(({item})=>item.link).length>=10 },
+  { id:"allcats",  icon:"🌈", name:"Man of Culture",     desc:"Add to all 9 categories",      check:(all)=>new Set(all.map(({cat})=>cat.id)).size>=9 },
+  { id:"private",  icon:"🔒", name:"Secret Vault",       desc:"Make 3 items private",         check:(all)=>all.filter(({item})=>item.private).length>=3 },
+  { id:"quoted",   icon:"💬", name:"Quote Master",       desc:"Save 10 taglines",             check:(all)=>all.filter(({item})=>item.tagline).length>=10 },
+];
+
+function ScrollTop(){
+  const [show,setShow]=useState(false);
+  useEffect(()=>{ const fn=()=>setShow(window.scrollY>400); window.addEventListener("scroll",fn); return()=>window.removeEventListener("scroll",fn); },[]);
+  return <div className={`scroll-top${show?" show":""}`} onClick={()=>window.scrollTo({top:0,behavior:"smooth"})} title="Back to top">↑</div>;
+}
+
+function ShareBtn({item}){
+  const [copied,setCopied]=useState(false);
+  const share=()=>{
+    const url=item.link||window.location.href;
+    navigator.clipboard.writeText(url).then(()=>{setCopied(true);setTimeout(()=>setCopied(false),2000);});
+  };
+  return <button className={`share-btn${copied?" copied":""}`} onClick={share}>{copied?"✅ Copied!":"🔗 Share"}</button>;
+}
+
 function Toast({msg,emoji}){ return <div className="toast"><span>{emoji}</span>{msg}</div>; }
 
 function SearchBar({allItems,onSelect}){
   const [q,setQ]=useState("");const [open,setOpen]=useState(false);const ref=useRef();
-  const vis = q.length>1 ? allItems.filter(({item})=>item.name.toLowerCase().includes(q.toLowerCase())).slice(0,8) : [];
+  const vis = q.length>1 ? allItems.filter(({item})=>{
+    const n=item.name.toLowerCase(); const sq=q.toLowerCase();
+    return n.includes(sq)||item.genre?.toLowerCase().includes(sq)||item.year?.includes(sq)||item.description?.toLowerCase().includes(sq);
+  }).slice(0,10) : [];
   useEffect(()=>{ const fn=e=>{if(!ref.current?.contains(e.target)) setOpen(false);}; document.addEventListener("mousedown",fn); return()=>document.removeEventListener("mousedown",fn); },[]);
   return(
     <div className="nav-search" ref={ref}>
@@ -438,10 +510,20 @@ function Spotlight({tops,isOwner,onOpen,onAdd,onSpotChange}){
   const goTo=useCallback(i=>{clearTimeout(timer.current);setIdx(i);setAKey(k=>k+1);},[]);
   useEffect(()=>{ if(!tops.length) return; onSpotChange?.(tops[idx]); },[idx,tops]);
   useEffect(()=>{ if(!tops.length) return; timer.current=setTimeout(()=>setIdx(i=>(i+1)%tops.length),6000); return()=>clearTimeout(timer.current); },[idx,aKey,tops.length]);
+  useEffect(()=>{
+    const fn=e=>{
+      if(document.activeElement?.tagName==="INPUT"||document.activeElement?.tagName==="TEXTAREA") return;
+      if(e.key==="ArrowRight") goTo((idx+1)%tops.length);
+      if(e.key==="ArrowLeft")  goTo((idx-1+tops.length)%tops.length);
+    };
+    document.addEventListener("keydown",fn);
+    return()=>document.removeEventListener("keydown",fn);
+  },[idx,tops.length,goTo]);
   if(!tops.length) return(
     <div className="spot"><div className="spot-empty">
-      <div className="spot-empty-h">YOUR VAULT IS EMPTY</div>
-      <div className="spot-empty-s">Start adding your favourites</div>
+      <div style={{fontSize:60,marginBottom:16}}>🌟</div>
+      <div className="spot-empty-h">{isOwner?"YOUR VAULT IS EMPTY":"NOTHING PUBLIC YET"}</div>
+      <div className="spot-empty-s">{isOwner?"Start adding your favourites":"The owner hasn't added public items yet"}</div>
       {isOwner&&<button className="sp-btn-w" onClick={onAdd}>+ Add First Item</button>}
     </div></div>
   );
@@ -495,12 +577,13 @@ function Spotlight({tops,isOwner,onOpen,onAdd,onSpotChange}){
 
 function NC({item,cat,isOwner,onOpen,onEdit,onDelete,onTogglePrivate,onRewatch}){
   const sh=SHAPE[cat.id]||"tall";
+  const [hovered,setHovered]=useState(false);
   return(
-    <div className={`nc ${sh}${item.private?" is-private":""}`} onClick={()=>onOpen(item,cat)}>
+    <div className={`nc ${sh}${item.private?" is-private":""}`} onClick={()=>onOpen(item,cat)} onMouseEnter={()=>setHovered(true)} onMouseLeave={()=>setHovered(false)}>
       <div className="nc-img-box">
         <div className="nc-ph">{cat.icon}</div>
-        {item.image&&<img src={item.image} alt="" className="nc-real-img" onError={e=>e.target.style.display="none"}/>}
-        {item.trailerUrl&&<div className="nc-trailer"><iframe src={item.trailerUrl+"?autoplay=1&mute=1&controls=0&loop=1"} allow="autoplay"/></div>}
+        {item.image&&<img src={item.image} alt="" loading="lazy" className="nc-real-img" onError={e=>e.target.style.display="none"}/>}
+        {item.trailerUrl&&hovered&&<div className="nc-trailer"><iframe src={item.trailerUrl+"?autoplay=1&mute=1&controls=0&loop=1&playlist="+item.trailerUrl.split("/").pop()} allow="autoplay"/></div>}
         {item.rating&&<div className="nc-star">{item.rating.split(" ")[0]}</div>}
         {item.rewatchCount>0&&<div className="nc-rw-badge">▶ {item.rewatchCount}×</div>}
         {isOwner&&item.private&&<div className="nc-priv-badge">🔒</div>}
@@ -543,7 +626,7 @@ function NRow({cat,items,isOwner,onOpen,onEdit,onDelete,onAdd,onTogglePrivate,on
     <div className="nrow">
       <div className="nrow-hdr">
         <div className="nrow-left">
-          <div className="nrow-title">{cat.label}</div>
+          <div className="nrow-title"><span className="nrow-cat-icon">{cat.icon}</span>{cat.label}</div>
           <span className="nrow-count">{sorted.length}{isOwner&&items.filter(i=>i.private).length>0&&<span style={{color:"var(--gold)",fontSize:10,marginLeft:4}}>({items.filter(i=>i.private).length}🔒)</span>}</span>
         </div>
         <div className="nrow-right">
@@ -577,9 +660,19 @@ function NRow({cat,items,isOwner,onOpen,onEdit,onDelete,onAdd,onTogglePrivate,on
 }
 
 function MoodBoard({allItems,isOwner,onOpen}){
-  const visible=isOwner?allItems:allItems.filter(({item})=>!item.private);
+  const [filter,setFilter]=useState("all");
+  const visible=(isOwner?allItems:allItems.filter(({item})=>!item.private)).filter(({cat})=>filter==="all"||cat.id===filter);
+  const activeCats=CATS.filter(cat=>allItems.some(({cat:c})=>c.id===cat.id));
   return(
     <div className="moodboard-wrap">
+      <div className="mb-filter-bar">
+        <button className={`mb-filter${filter==="all"?" on":""}`} onClick={()=>setFilter("all")}>All</button>
+        {activeCats.map(cat=>(
+          <button key={cat.id} className={`mb-filter${filter===cat.id?" on":""}`} style={filter===cat.id?{borderColor:cat.color,color:cat.color,background:`${cat.color}11`}:{}} onClick={()=>setFilter(cat.id)}>
+            {cat.icon} {cat.label}
+          </button>
+        ))}
+      </div>
       <div className="moodboard">
         {visible.map(({item,cat})=>(
           <div key={item.id} className={`mb-card ${SHAPE[cat.id]||"tall"}`} onClick={()=>onOpen(item,cat)}>
@@ -592,6 +685,7 @@ function MoodBoard({allItems,isOwner,onOpen}){
             </div>
           </div>
         ))}
+        {visible.length===0&&<div style={{gridColumn:"1/-1",textAlign:"center",padding:"60px 0",color:"var(--t3)"}}>Nothing here yet.</div>}
       </div>
     </div>
   );
@@ -621,7 +715,7 @@ function RecommendsPage({allItems,onOpen}){
   );
 }
 
-function WrappedPage({allItems}){
+function WrappedPage({allItems,onOpen}){
   const total=allItems.length;
   const obsessed=allItems.filter(({item})=>item.rating==="★★★ Obsessed").length;
   const linked=allItems.filter(({item})=>item.link).length;
@@ -633,12 +727,35 @@ function WrappedPage({allItems}){
   const maxD=Math.max(1,...Object.values(decades));
   const sortedDecades=Object.entries(decades).sort((a,b)=>parseInt(a[0])-parseInt(b[0]));
   const decadeColors=["#E50914","#0071EB","#1DB954","#FF6B00","#9B59B6","#00BFA5","#F5C518"];
+  const publicItems=allItems.filter(({item})=>!item.private);
+  const podium=publicItems.map(({item,cat})=>({item,cat,sc:item.rating==="★★★ Obsessed"?3:item.rating==="★★ Loved"?2:item.rating==="★ Liked"?1:0})).sort((a,b)=>b.sc-a.sc).slice(0,3);
+  const earnedBadges=BADGES.filter(b=>b.check(allItems));
   return(
     <div className="wrapped-page">
       <div className="wrapped-hero">
         <div className="wrapped-title">YOUR WRAPPED</div>
         <div className="wrapped-sub">Everything you love, by the numbers</div>
       </div>
+      {/* Podium */}
+      {podium.length>=2&&(
+        <div className="podium">
+          {[podium[1],podium[0],podium[2]].filter(Boolean).map((p,i)=>{
+            const rank=[2,1,3][i]; const sz=[100,130,90][i]; const ht=[140,170,120][i];
+            const colors=["#C0C0C0","#F5C518","#CD7F32"];
+            return p?(
+              <div key={p.item.id} className="pod-card" onClick={()=>onOpen(p.item,p.cat)}>
+                <div className="pod-img" style={{width:sz,height:ht,border:`2px solid ${colors[i]}`}}>
+                  <span style={{fontSize:36}}>{p.cat.icon}</span>
+                  {p.item.image&&<img src={p.item.image} alt="" onError={e=>e.target.style.display="none"}/>}
+                </div>
+                <div className="pod-rank" style={{color:colors[i]}}>#{rank}</div>
+                <div className="pod-name">{p.item.name}</div>
+                <div className="pod-cat">{p.cat.label}</div>
+              </div>
+            ):null;
+          })}
+        </div>
+      )}
       <div className="wrapped-grid">
         <div className="wrapped-card"><div className="wc-num">{total}</div><div className="wc-lbl">Total Favourites</div></div>
         <div className="wrapped-card"><div className="wc-num">{obsessed}</div><div className="wc-lbl">Obsessed</div></div>
@@ -666,6 +783,20 @@ function WrappedPage({allItems}){
           ))}
         </div>
       )}
+      <div className="wrapped-section">
+        <div className="ws-title">🏅 Badges <span style={{fontSize:11,color:"var(--t3)",fontWeight:400}}>({earnedBadges.length}/{BADGES.length} earned)</span></div>
+        <div className="badges-row">
+          {BADGES.map(b=>{const earned=earnedBadges.some(e=>e.id===b.id);return(
+            <div key={b.id} className={`badge${earned?" earned":" locked"}`}>
+              <span className="badge-icon">{b.icon}</span>
+              <div className="badge-info">
+                <div className="badge-name">{b.name}</div>
+                <div className="badge-desc">{b.desc}</div>
+              </div>
+            </div>
+          );})}
+        </div>
+      </div>
     </div>
   );
 }
@@ -696,13 +827,19 @@ function QuotesPage({allItems}){
   );
 }
 
-function SuggestsPage({allItems}){
+function SuggestsPage({allItems,isOwner,onQuickAdd}){
   const [results,setResults]=useState([]);const [loading,setLoading]=useState(false);const [done,setDone]=useState(false);
+  const [added,setAdded]=useState({});
+  const existing=new Set(allItems.map(({item})=>item.name.toLowerCase()));
   const fetch_=async()=>{
     setLoading(true);
     try{const r=await aiSuggest(allItems);setResults(r);setDone(true);}
     catch{setResults([]);}
     finally{setLoading(false);}
+  };
+  const quickAdd=(r,cat)=>{
+    onQuickAdd({name:r.name,year:r.year||"",genre:"",description:r.reason,rating:"",image:"",link:"",trailerUrl:"",soundtrack:"",fact:"",tagline:"",notes:"",id:Date.now().toString(),rewatchCount:0,addedAt:new Date().toISOString()},cat);
+    setAdded(a=>({...a,[r.name]:true}));
   };
   return(
     <div className="suggests-page">
@@ -710,16 +847,19 @@ function SuggestsPage({allItems}){
         <div className="sugg-title">YOU MIGHT LIKE</div>
         <div className="sugg-sub">AI picks based on your vault</div>
         {!done&&<button className="sugg-btn" disabled={loading} onClick={fetch_}>{loading?<><span className="ai-spin"><i/><i/><i/></span> Thinking…</>:"✨ Generate Suggestions"}</button>}
-        {done&&<button className="sugg-btn" onClick={()=>{setDone(false);setResults([]);}}>↺ Regenerate</button>}
+        {done&&<button className="sugg-btn" onClick={()=>{setDone(false);setResults([]);setAdded({});}}>↺ Regenerate</button>}
       </div>
       {results.length>0&&(
         <div className="sugg-grid">
-          {results.map((r,i)=>{const cat=CATS.find(c=>c.id===r.category)||CATS[0];return(
+          {results.map((r,i)=>{const cat=CATS.find(c=>c.id===r.category)||CATS[0];const isAdded=added[r.name]||existing.has(r.name.toLowerCase());return(
             <div key={i} className="sugg-card">
               <div className="sugg-cat" style={{color:cat.color}}>{cat.icon} {cat.label}</div>
               <div className="sugg-name">{r.name}</div>
               {r.year&&<div className="sugg-year">{r.year}</div>}
               <div className="sugg-reason">{r.reason}</div>
+              {isOwner&&<button className={`sugg-add-btn${isAdded?" added":""}`} disabled={isAdded} onClick={()=>quickAdd(r,cat)}>
+                {isAdded?"✅ In Vault":"+ Add to Vault"}
+              </button>}
             </div>
           );})}
         </div>
@@ -729,6 +869,7 @@ function SuggestsPage({allItems}){
 }
 
 function ThemeModal({current,onSelect,onClose}){
+  useEffect(()=>{ document.body.style.overflow="hidden"; return()=>{ document.body.style.overflow=""; }; },[]);
   return(
     <div className="modal-bg" onClick={e=>{if(e.target.classList.contains("modal-bg")) onClose();}}>
       <div className="modal-box" style={{maxWidth:400}}>
@@ -749,6 +890,7 @@ function ThemeModal({current,onSelect,onClose}){
 function EditModal({cat,edit,onClose,onSave}){
   const [form,setForm]=useState({name:"",genre:"",year:"",description:"",tagline:"",fact:"",image:"",link:"",trailerUrl:"",soundtrack:"",rating:"",notes:"",...(edit||{})});
   const [aiStatus,setAiStatus]=useState(null);const [aiLoading,setAiLoading]=useState(false);
+  useEffect(()=>{ document.body.style.overflow="hidden"; return()=>{ document.body.style.overflow=""; }; },[]);
   const set=k=>e=>setForm(f=>({...f,[k]:e.target.value}));
   const doAI=async()=>{
     if(!form.name.trim()) return;
@@ -806,7 +948,12 @@ function EditModal({cat,edit,onClose,onSave}){
 
 function Detail({item,cat,isOwner,onClose,onEdit,onDelete,onRewatch}){
   const [showTrailer,setShowTrailer]=useState(false);
-  useEffect(()=>{ const fn=e=>{if(e.key==="Escape") onClose();}; document.addEventListener("keydown",fn); return()=>document.removeEventListener("keydown",fn); },[]);
+  useEffect(()=>{
+    document.body.style.overflow="hidden";
+    const fn=e=>{if(e.key==="Escape") onClose();};
+    document.addEventListener("keydown",fn);
+    return()=>{ document.body.style.overflow=""; document.removeEventListener("keydown",fn); };
+  },[onClose]);
   return(
     <>
       <div className="det-bg" onClick={onClose}/>
@@ -859,8 +1006,10 @@ function Detail({item,cat,isOwner,onClose,onEdit,onDelete,onRewatch}){
         </div>
         <div className="det-footer">
           {item.link&&<a className="det-btn det-btn-w" href={item.link} target="_blank" rel="noreferrer">🔗 Open</a>}
+          <ShareBtn item={item}/>
           {isOwner&&<button className="det-btn det-btn-g" onClick={()=>onEdit(item)}>✏ Edit</button>}
           {isOwner&&<button className="det-btn det-btn-d" onClick={()=>{if(window.confirm("Remove?")) onDelete(item.id,cat.id);}}>🗑 Delete</button>}
+          {item.addedAt&&<span className="det-added">Added {new Date(item.addedAt).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"})}</span>}
         </div>
       </div>
     </>
@@ -874,7 +1023,8 @@ export default function App(){
   const [saving,setSaving]   = useState(false);
   const [isOwner,setIsOwner] = useState(()=>checkUrlOwner());
   const [theme,setTheme]     = useState(()=>localStorage.getItem(THEME_KEY)||"spotify");
-  const [view,setView]       = useState("rows");
+  const [view,setView_]      = useState("rows");
+  const setView = v => { setView_(v); window.scrollTo({top:0,behavior:"smooth"}); };
   const [showAdd,setShowAdd] = useState(false);
   const [addCat,setAddCat]   = useState(null);
   const [editItem,setEditItem]= useState(null);
@@ -891,21 +1041,38 @@ export default function App(){
     const lnk=document.createElement("link");lnk.rel="icon";lnk.type="image/png";
     lnk.href=`data:image/png;base64,${FAVICON_B64}`;document.head.appendChild(lnk);
     document.title="Shubham.World";
+    // Meta description
+    let meta=document.querySelector('meta[name="description"]');
+    if(!meta){meta=document.createElement("meta");meta.name="description";document.head.appendChild(meta);}
+    meta.content="Shubham's personal vault of favourite movies, shows, music, books and more.";
+    // Theme color
+    let tc=document.querySelector('meta[name="theme-color"]');
+    if(!tc){tc=document.createElement("meta");tc.name="theme-color";document.head.appendChild(tc);}
+    tc.content="#0d0d0d";
   },[]);
 
   /* load from Gist */
   useEffect(()=>{
-    gistRead().then(d=>{setData(d||{});setLoading(false);}).catch(()=>{setLoading(false);showT("Could not load vault","⚠️");});
+    gistRead()
+      .then(d=>{setData(d||{});setLoading(false);})
+      .catch(()=>{
+        setLoading(false);
+        showT("Could not load vault — check connection","⚠️");
+      });
   },[]);
 
   /* auto-save to Gist */
+  const isOwnerRef=useRef(isOwner);const loadingRef=useRef(loading);
+  useEffect(()=>{isOwnerRef.current=isOwner;},[isOwner]);
+  useEffect(()=>{loadingRef.current=loading;},[loading]);
   useEffect(()=>{
-    if(!isOwner||loading) return;
+    if(!isOwnerRef.current||loadingRef.current) return;
     clearTimeout(saveTimer.current);setSaving(true);
     saveTimer.current=setTimeout(()=>{
       gistWrite(data).then(()=>setSaving(false)).catch(()=>{setSaving(false);showT("Save failed","⚠️");});
     },1400);
-  },[data]);
+    return()=>clearTimeout(saveTimer.current);
+  },[data]); // eslint-disable-line
 
   useEffect(()=>{ const fn=()=>setScrolled(window.scrollY>60); window.addEventListener("scroll",fn); return()=>window.removeEventListener("scroll",fn); },[]);
 
@@ -924,7 +1091,7 @@ export default function App(){
 
   const openAdd  = cat        =>{setAddCat(cat);setEditItem(null);setShowAdd(true);};
   const openEdit = (item,cat) =>{setAddCat(cat);setEditItem(item);setShowAdd(true);};
-  const openDet  = (item,cat) =>{setDetail({item,cat});};
+  const openDet  = (item,cat) =>{setDetail({itemId:item.id,catId:cat.id});};
 
   const handleSave=vals=>{
     if(editItem){
@@ -934,7 +1101,7 @@ export default function App(){
       const newItem={...vals,id:Date.now().toString(),rewatchCount:0,addedAt:new Date().toISOString()};
       setData(d=>({...d,[addCat.id]:[...(d[addCat.id]||[]),newItem]}));
       showT(`"${vals.name}" added!`,addCat.icon);
-      if(vals.rating==="★★★ Obsessed") setTimeout(fireConfetti,200);
+      if(vals.rating==="★★★ Obsessed") setTimeout(fireConfetti,300);
     }
     setShowAdd(false);setEditItem(null);
   };
@@ -951,7 +1118,7 @@ export default function App(){
     if(!cid) return;
     let nowPrivate=false;
     setData(d=>({...d,[cid]:(d[cid]||[]).map(i=>{if(i.id!==id) return i;nowPrivate=!i.private;return{...i,private:!i.private};})}));
-    setTimeout(()=>showT(nowPrivate?"Hidden from public 🔒":"Now public 🌐",""),50);
+    setTimeout(()=>showT(nowPrivate?"Hidden from public":"Now public 🌐",nowPrivate?"🔒":"🌐"),50);
   };
 
   const handleRewatch=(id,catId)=>{
@@ -961,14 +1128,22 @@ export default function App(){
     showT("Rewatch logged! ▶","🎬");
   };
 
+  const handleQuickAdd=(item,cat)=>{
+    const exists=(data[cat.id]||[]).some(i=>i.name.toLowerCase()===item.name.toLowerCase());
+    if(exists){ showT(`"${item.name}" already in vault`,"ℹ️"); return; }
+    setData(d=>({...d,[cat.id]:[...(d[cat.id]||[]),{...item,addedAt:new Date().toISOString()}]}));
+    showT(`"${item.name}" added!`,cat.icon);
+  };
+
   const CSS=buildCSS(theme);
 
   if(loading) return(
     <>
       <style>{CSS}</style>
-      <div style={{height:"100vh",display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:16,background:THEMES[theme].bg}}>
-        <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:32,letterSpacing:".1em",color:THEMES[theme].accent}}>SHUBHAM.WORLD</div>
+      <div style={{height:"100vh",display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:20,background:THEMES[theme].bg}}>
+        <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:36,letterSpacing:".12em",color:THEMES[theme].accent,textShadow:`0 0 40px ${THEMES[theme].accent}55`}}>SHUBHAM.WORLD</div>
         <div className="ai-spin"><i/><i/><i/></div>
+        <div style={{fontSize:12,color:"#555",marginTop:4,letterSpacing:".06em"}}>Loading vault…</div>
       </div>
     </>
   );
@@ -988,7 +1163,7 @@ export default function App(){
         <div className="logo">
           <div className={`logo-dot${isOwner?" owner-on":""}`} onClick={isOwner?lockOwner:undefined} title={isOwner?"Click to lock":""}/>
           SHUBHAM.WORLD
-          {saving&&<span style={{fontSize:10,color:"var(--accent)",marginLeft:6,opacity:.7}}>saving…</span>}
+          {isOwner&&saving&&<span style={{fontSize:10,color:"var(--accent)",marginLeft:6,opacity:.7,letterSpacing:".04em"}}>saving…</span>}
         </div>
         <div className="nav-r">
           <SearchBar allItems={allItems} onSelect={openDet}/>
@@ -1015,24 +1190,38 @@ export default function App(){
         </>
       )}
 
-      <div className="view-tabs">
+      <div className={`view-tabs${view!=="rows"?" top-pad":""}`}>
         {VIEWS.map(v=><button key={v.id} className={`vtab${view===v.id?" on":""}`} onClick={()=>setView(v.id)}>{v.label}</button>)}
       </div>
 
-      <div className="content">
-        {view==="rows"&&CATS.map(cat=><NRow key={cat.id} cat={cat} items={items(cat.id)} isOwner={isOwner} onOpen={openDet} onEdit={openEdit} onDelete={handleDelete} onAdd={()=>openAdd(cat)} onTogglePrivate={handleTogglePrivate} onRewatch={handleRewatch}/>)}
+      <div className="content" style={{minHeight:"60vh"}}>
+        {view==="rows"&&(()=>{
+          const visibleCats=CATS.filter(cat=>(isOwner?items(cat.id).length>0:items(cat.id).filter(i=>!i.private).length>0));
+          if(!isOwner&&visibleCats.length===0) return(
+            <div style={{textAlign:"center",padding:"80px 20px",color:"var(--t3)"}}>
+              <div style={{fontSize:52,marginBottom:16}}>🔒</div>
+              <div style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:28,letterSpacing:".06em",marginBottom:8}}>VAULT IS PRIVATE</div>
+              <div style={{fontSize:14}}>The owner hasn't made any favourites public yet.</div>
+            </div>
+          );
+          return CATS.map(cat=><NRow key={cat.id} cat={cat} items={items(cat.id)} isOwner={isOwner} onOpen={openDet} onEdit={openEdit} onDelete={handleDelete} onAdd={()=>openAdd(cat)} onTogglePrivate={handleTogglePrivate} onRewatch={handleRewatch}/>);
+        })()}
         {view==="moodboard"&&<MoodBoard allItems={allItems} isOwner={isOwner} onOpen={openDet}/>}
         {view==="recommends"&&<RecommendsPage allItems={allItems} onOpen={openDet}/>}
         {view==="quotes"&&<QuotesPage allItems={allItems}/>}
-        {view==="wrapped"&&<WrappedPage allItems={allItems}/>}
-        {view==="suggests"&&<SuggestsPage allItems={allItems}/>}
-        <div className="site-footer">{total} favourites · {linked} links<br/><span style={{opacity:.4}}>Made with 🖤 by Shubham</span></div>
+        {view==="wrapped"&&<WrappedPage allItems={allItems} onOpen={openDet}/>}
+        {view==="suggests"&&<SuggestsPage allItems={allItems} isOwner={isOwner} onQuickAdd={handleQuickAdd}/>}
+        <div className="site-footer">
+          <div style={{marginBottom:6}}>{total} favourites · {linked} links · {CATS.filter(c=>items(c.id).length>0).length} categories</div>
+          <div style={{opacity:.35,fontSize:11}}>SHUBHAM.WORLD · Made with 🖤</div>
+        </div>
       </div>
 
-      {detail&&<Detail item={detail.item} cat={detail.cat} isOwner={isOwner} onClose={()=>setDetail(null)} onEdit={item=>{setDetail(null);openEdit(item,detail.cat);}} onDelete={handleDelete} onRewatch={handleRewatch}/>}
+      {detail&&(()=>{const dCat=CATS.find(c=>c.id===detail.catId);const dItem=(data[detail.catId]||[]).find(i=>i.id===detail.itemId);return dCat&&dItem?<Detail item={dItem} cat={dCat} isOwner={isOwner} onClose={()=>setDetail(null)} onEdit={item=>{setDetail(null);openEdit(item,dCat);}} onDelete={handleDelete} onRewatch={handleRewatch}/>:null;})()}
       {showAdd&&addCat&&isOwner&&<EditModal cat={addCat} edit={editItem} onClose={()=>{setShowAdd(false);setEditItem(null);}} onSave={handleSave}/>}
       {showTheme&&<ThemeModal current={theme} onSelect={changeTheme} onClose={()=>setShowTheme(false)}/>}
       {toast&&<Toast msg={toast.msg} emoji={toast.emoji}/>}
+      <ScrollTop/>
     </>
   );
 }
